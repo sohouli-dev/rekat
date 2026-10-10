@@ -7,8 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#111827">
 <title>رکعت شمار پرهام</title>
- 
- <link rel="icon" type="image/png" href="icon-512.png">
+
+<!-- لینک‌های مربوط به PWA و آیکون -->
+<link rel="icon" type="image/png" href="icon-512.png">
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="manifest.json">
 
@@ -121,7 +122,6 @@
     margin-top: 4px;
   }
 
-  /* مشخصات نشانگر نماز در پایین وسط کادر لمس */
   .current-prayer-badge {
     position: absolute;
     bottom: 12px;
@@ -200,11 +200,11 @@
     gap: 6px;
   }
 
-  .fullscreen-btn {
+  .exit-btn {
     flex: 1;
     background: var(--surface);
     border: 1.5px solid var(--border);
-    color: var(--text);
+    color: var(--muted);
     border-radius: var(--r-lg);
     font-size: 11px;
     font-weight: 600;
@@ -212,11 +212,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
   }
 
-  .fullscreen-btn:active {
+  .exit-btn:active {
     background: var(--touch-act);
+    color: var(--text);
   }
 
   .reset-btn-inline {
@@ -423,7 +424,6 @@
         <span class="touch-label" id="touchMainLabel">محل حساس به لمس</span>
         <span class="touch-sublabel" id="touchSubLabel">لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود</span>
       </div>
-      <!-- نوشته نماز در پایین وسط کادر لمس -->
       <span id="currentPrayerLabel" class="current-prayer-badge">هنوز نمازی انتخاب نشده</span>
     </div>
     <div class="flash" id="flash"></div>
@@ -435,9 +435,9 @@
       <span class="counter-value" id="sajdeh-val">0</span>
     </div>
 
-    <!-- دکمه تمام‌صفحه و ریست -->
     <div class="center-controls">
-      <button class="fullscreen-btn" id="fullscreenToggleBtn">⛶ تمام‌صفحه</button>
+      <!-- دکمه خروج جدید جایگزین تمام‌صفحه -->
+      <button class="exit-btn" id="exitAppBtn">✕ خروج</button>
       <button class="reset-btn-inline" id="resetBtn">
         <span>ریست شمارنده</span>
         <span style="font-size:9px; opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
@@ -552,7 +552,6 @@
       }
     }
 
-    // افکت فلش
     const flash = document.getElementById('flash');
     flash.classList.remove('go');
     void flash.offsetWidth;
@@ -560,7 +559,6 @@
 
     render();
 
-    // انیمیشن کول‌داون ۳ ثانیه
     const cooldownFill = document.getElementById('cooldownBgFill');
     const start = Date.now();
     const zone = document.getElementById('touchZone');
@@ -625,13 +623,13 @@
   resetBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startResetHold(); });
   resetBtn.addEventListener('touchend', cancelReset);
 
-  // دکمه تمام‌صفحه
-  document.getElementById('fullscreenToggleBtn').addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
+  // عملکرد دکمه خروج
+  document.getElementById('exitAppBtn').addEventListener('click', () => {
+    window.close();
+    // در صورتی که مرورگر بستن پنجره را مسدود کند:
+    setTimeout(() => {
+      window.location.href = 'about:blank';
+    }, 100);
   });
 
   render();

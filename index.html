@@ -50,33 +50,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 12px 16px;
-    transform: rotate(180deg);
-  }
-
-  .top-status-bar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 4px 6px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .current-prayer-badge {
-    color: var(--accent);
-    font-weight: 700;
-  }
-
-  .fullscreen-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 8px;
-    padding: 2px 8px;
-    font-size: 11px;
-    cursor: pointer;
+    padding: 10px 14px;
   }
 
   .touch-wrap {
@@ -143,6 +117,23 @@
     margin-top: 4px;
   }
 
+  /* مشخصات نشانگر نماز در پایین وسط کادر لمس */
+  .current-prayer-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    z-index: 2;
+    pointer-events: none;
+    background: rgba(17, 24, 39, 0.7);
+    padding: 3px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   .flash {
     position: absolute;
     inset: 0;
@@ -166,8 +157,8 @@
     display: flex;
     width: 100%;
     gap: 10px;
-    margin-top: 10px;
-    height: 95px;
+    margin-top: 8px;
+    height: 90px;
   }
 
   .counter-card {
@@ -190,7 +181,7 @@
   }
 
   .counter-value {
-    font-size: 44px;
+    font-size: 40px;
     font-weight: 800;
     line-height: 1;
   }
@@ -198,8 +189,34 @@
   .counter-card.sajdeh .counter-value { color: var(--accent2); }
   .counter-card.rakaat .counter-value { color: var(--accent); }
 
+  .center-controls {
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fullscreen-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    border-radius: var(--r-lg);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .fullscreen-btn:active {
+    background: var(--touch-act);
+  }
+
   .reset-btn-inline {
-    flex: 1.2;
+    flex: 1.3;
     background: var(--danger-bg);
     color: var(--danger);
     border: 1.5px solid #7f1d1d;
@@ -390,14 +407,44 @@
 <body>
 
 <div class="orient-hint">
-  📱 لطفاً گوشی را افقی بگیرید
+  📱 لطفاً برای استفاده، گوشی را به حالت افقی نگه دارید
 </div>
 
 <div class="app-container">
 
-  <div class="top-status-bar">
-    <span id="currentPrayerLabel" class="current-prayer-badge">هنوز نمازی انتخاب نشده</span>
-    <button class="fullscreen-btn" id="fullscreenToggleBtn">⛶ تمام‌صفحه</button>
+  <div class="touch-wrap">
+    <div class="touch-zone" id="touchZone" onclick="handleTouchClick()">
+      <div class="cooldown-bg-fill" id="cooldownBgFill"></div>
+      <div class="touch-content-wrapper">
+        <span class="touch-label" id="touchMainLabel">محل حساس به لمس</span>
+        <span class="touch-sublabel" id="touchSubLabel">لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود</span>
+      </div>
+      <!-- نوشته نماز در پایین وسط کادر لمس -->
+      <span id="currentPrayerLabel" class="current-prayer-badge">هنوز نمازی انتخاب نشده</span>
+    </div>
+    <div class="flash" id="flash"></div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="counter-card sajdeh">
+      <span class="counter-label">سجده</span>
+      <span class="counter-value" id="sajdeh-val">0</span>
+    </div>
+
+    <!-- دکمه تمام‌صفحه و ریست -->
+    <div class="center-controls">
+      <button class="fullscreen-btn" id="fullscreenToggleBtn">⛶ تمام‌صفحه</button>
+      <button class="reset-btn-inline" id="resetBtn">
+        <span>ریست شمارنده</span>
+        <span style="font-size:9px; opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
+        <div class="reset-progress" id="resetProgress"></div>
+      </button>
+    </div>
+
+    <div class="counter-card rakaat">
+      <span class="counter-label">رکعت</span>
+      <span class="counter-value" id="rakaat-val">0</span>
+    </div>
   </div>
 
   <div class="select-overlay show" id="selectOverlay">
@@ -429,35 +476,6 @@
     <div class="done-box">
       <div class="done-text" id="doneText"></div>
       <button class="done-reset" onclick="resetAndChoosePrayer()">نماز جدید</button>
-    </div>
-  </div>
-
-  <div class="touch-wrap">
-    <div class="touch-zone" id="touchZone" onclick="handleTouchClick()">
-      <div class="cooldown-bg-fill" id="cooldownBgFill"></div>
-      <div class="touch-content-wrapper">
-        <span class="touch-label" id="touchMainLabel">محل حساس به لمس</span>
-        <span class="touch-sublabel" id="touchSubLabel">لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود</span>
-      </div>
-    </div>
-    <div class="flash" id="flash"></div>
-  </div>
-
-  <div class="bottom-row">
-    <div class="counter-card sajdeh">
-      <span class="counter-label">سجده</span>
-      <span class="counter-value" id="sajdeh-val">0</span>
-    </div>
-
-    <button class="reset-btn-inline" id="resetBtn">
-      <span>ریست شمارنده</span>
-      <span style="font-size:9px; opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
-      <div class="reset-progress" id="resetProgress"></div>
-    </button>
-
-    <div class="counter-card rakaat">
-      <span class="counter-label">رکعت</span>
-      <span class="counter-value" id="rakaat-val">0</span>
     </div>
   </div>
 

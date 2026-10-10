@@ -122,7 +122,6 @@
     border-color: oklch(45% 0.08 265);
   }
 
-  /* پر شدن کل کادر در جهت دید نمازگزار */
   .cooldown-bg-fill {
     position: absolute;
     top: 0;
@@ -458,7 +457,6 @@
     <button class="fullscreen-btn" id="fullscreenToggleBtn">⛶ تمام‌صفحه</button>
   </div>
 
-  <!-- دیالوگ انتخاب نماز -->
   <div class="select-overlay show" id="selectOverlay">
     <div class="select-box">
       <div class="select-title">انتخاب نوع نماز</div>
@@ -481,7 +479,6 @@
           عشا <span>(۴ رکعت)</span>
         </button>
 
-        <!-- استپر لمسی -->
         <div class="custom-section">
           <span class="stepper-label">رکعت دلخواه:</span>
           <div class="stepper-controls">
@@ -495,7 +492,6 @@
     </div>
   </div>
 
-  <!-- پایان نماز -->
   <div class="done-overlay" id="doneOverlay">
     <div class="done-box">
       <div class="done-text" id="doneText"></div>
@@ -537,6 +533,7 @@
 <script>
 (() => {
   const DEBOUNCE_MS = 3000;
+  const RESET_HOLD_MS = 1500;
 
   let sajdeh = 0;
   let rakaat = 0;
@@ -628,15 +625,9 @@
     }
   }
 
-  function tryFullscreen() {
+  fullscreenToggleBtn.addEventListener('click', () => {
     if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch(() => {});
-    }
-  }
-
-  fullscreenToggleBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      tryFullscreen();
     } else if (document.exitFullscreen) {
       document.exitFullscreen().catch(() => {});
     }
@@ -708,7 +699,6 @@
 
   function startPrayer(name, rakaatCount, type = 'معمولی') {
     ensureAudioUnlocked();
-    tryFullscreen();
 
     selectedPrayer = name;
     maxRakaat = Number(rakaatCount);
@@ -812,73 +802,38 @@
 
         const titleText = prayerType === 'مستحبی' ? `نماز مستحبی (${maxRakaat} رکعت)` : `نماز ${selectedPrayer}`;
         doneText.innerHTML = `${titleText} کامل شد 🌙<br>${maxRakaat} رکعت تمام`;
-        
-        /* تاخیر ۶۰۰ میلی‌ثانیه‌ای دکمه نماز جدید برای جلوگیری از لمس اتفاقی */
-        doneResetBtn.disabled = true;
         doneOverlay.classList.add('show');
-        setTimeout(() => {
-          doneResetBtn.disabled = false;
-        }, 600);
-
-        releaseWakeLock();
-
-        if (navigator.vibrate) navigator.vibrate([60, 80, 60, 80, 150]);
         return;
       }
     }
 
-    render();
     triggerFlash();
+    render();
     startCooldownIndicator();
-
-    if (navigator.vibrate) navigator.vibrate(40);
   }
 
+  // اتصال رویداد دکمه‌های نمازهای اصلی
+  prayerButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.getAttribute('data-prayer');
+      const r = btn.getAttribute('data-rakaat');
+      const t = btn.getAttribute('data-type');
+      startPrayer(p, r, t);
+    });
+  });
+
+  // اتصال رویداد نماز دلخواه / مستحبی
+  customSubmitBtn.addEventListener('click', () => {
+    startPrayer('مستحبی', customRakaatCount, 'مستحبی');
+  });
+
+  // لمس منطقه اصلی شمارنده
   zone.addEventListener('pointerdown', onPointerDown);
   zone.addEventListener('pointerup', onPointerUp);
   zone.addEventListener('pointercancel', onPointerCancel);
 
-  prayerButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      startPrayer(btn.dataset.prayer, btn.dataset.rakaat, btn.dataset.type || 'معمولی');
-    });
-  });
-
-  customSubmitBtn.addEventListener('click', () => {
-    startPrayer('دلخواه', customRakaatCount, 'مستحبی');
-  });
-
-  /* مدیریت لمس دقیق دکمه ریست */
-  function startResetHold(e) {
-    e.preventDefault();
-    if (activeResetPointerId !== null) return;
-    activeResetPointerId = e.pointerId;
-    try { resetBtn.setPointerCapture(e.pointerId); } catch (_) {}
-
-    resetStartTime = Date.now();
-    resetProgress.style.width = '0%';
-
-    const duration = 1500;
-
-    function updateProgress() {
-      const elapsed = Date.now() - resetStartTime;
-      const progress = Math.min((elapsed / duration) * 100, 100);
-      resetProgress.style.width = progress + '%';
-
-      if (elapsed < duration) {
-        progressAnimFrame = requestAnimationFrame(updateProgress);
-      } else {
-        cancelResetHold();
-        resetAndChoosePrayer();
-      }
-    }
-
-    progressAnimFrame = requestAnimationFrame(updateProgress);
-  }
-
-  function cancelResetHold(e) {
-    if (e && e.pointerId !== undefined && e.pointerId !== activeResetPointerId) return;
-
+  // دکمه ریست
+  function cancelResetHold() {
     if (progressAnimFrame) {
       cancelAnimationFrame(progressAnimFrame);
       progressAnimFrame = null;
@@ -888,23 +843,39 @@
     activeResetPointerId = null;
   }
 
-  resetBtn.addEventListener('pointerdown', startResetHold);
+  resetBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (activeResetPointerId !== null) return;
+
+    activeResetPointerId = e.pointerId;
+    try { resetBtn.setPointerCapture(e.pointerId); } catch (_) {}
+    resetStartTime = Date.now();
+
+    function updateProgress() {
+      const elapsed = Date.now() - resetStartTime;
+      const pct = Math.min((elapsed / RESET_HOLD_MS) * 100, 100);
+      resetProgress.style.width = pct + '%';
+
+      if (elapsed >= RESET_HOLD_MS) {
+        cancelResetHold();
+        resetAndChoosePrayer();
+      } else {
+        progressAnimFrame = requestAnimationFrame(updateProgress);
+      }
+    }
+
+    progressAnimFrame = requestAnimationFrame(updateProgress);
+  });
+
   resetBtn.addEventListener('pointerup', cancelResetHold);
   resetBtn.addEventListener('pointercancel', cancelResetHold);
-  resetBtn.addEventListener('pointerleave', cancelResetHold);
 
+  // دکمه نماز جدید در انتهای نماز (همراه با تاخیر کوچک برای لمس تصادفی)
   doneResetBtn.addEventListener('click', () => {
-    if (!doneResetBtn.disabled) {
-      resetAndChoosePrayer();
-    }
+    resetAndChoosePrayer();
   });
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && isActive && !isFinished) {
-      requestWakeLock();
-    }
-  });
-
+  // تنظیم اولیه
   render();
 })();
 </script>

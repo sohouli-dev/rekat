@@ -8,6 +8,34 @@
 <meta name="theme-color" content="#111827">
 <title>رکعت شمار پرهام</title>
 
+<script>
+// Inline manifest as data URI to keep everything in one file
+(function() {
+  const manifest = {
+    name: "رکعت شمار پرهام",
+    short_name: "رکعت شمار",
+    display: "standalone",
+    orientation: "landscape",
+    start_url: "./",
+    background_color: "#111827",
+    theme_color: "#111827",
+    icons: [
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23111827'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' fill='%2372c472'%3E%D8%B1%3C/text%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml"
+      }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = url;
+  document.currentScript.parentNode.appendChild(link);
+})();
+</script>
+
 <style>
   *, *::before, *::after {
     box-sizing: border-box;
@@ -52,7 +80,6 @@
     display: flex;
     flex-direction: column;
     padding: 12px 16px;
-    transform: rotate(180deg);
   }
 
   .top-status-bar {
@@ -81,9 +108,7 @@
     cursor: pointer;
   }
 
-  .fullscreen-btn:active {
-    background: var(--surface);
-  }
+  .fullscreen-btn:active { background: var(--surface); }
 
   .touch-wrap {
     flex: 1;
@@ -124,9 +149,7 @@
 
   .cooldown-bg-fill {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
+    top: 0; bottom: 0; right: 0;
     width: 0%;
     background: oklch(68% 0.18 265 / 22%);
     pointer-events: none;
@@ -168,9 +191,7 @@
     z-index: 3;
   }
 
-  .flash.go {
-    animation: flash-anim 250ms ease forwards;
-  }
+  .flash.go { animation: flash-anim 250ms ease forwards; }
 
   @keyframes flash-anim {
     0%   { opacity: 1; }
@@ -238,8 +259,7 @@
 
   .reset-progress {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 0; right: 0;
     width: 0%;
     height: 4px;
     background: var(--danger);
@@ -256,9 +276,7 @@
     z-index: 100;
   }
 
-  .select-overlay.show, .done-overlay.show {
-    display: flex;
-  }
+  .select-overlay.show, .done-overlay.show { display: flex; }
 
   .select-box {
     width: min(500px, 100%);
@@ -310,9 +328,7 @@
     font-weight: normal;
   }
 
-  .prayer-btn:active {
-    background: var(--touch-act);
-  }
+  .prayer-btn:active { background: var(--touch-act); }
 
   .custom-section {
     grid-column: 1 / -1;
@@ -355,14 +371,8 @@
     font-family: inherit;
   }
 
-  .step-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-
-  .step-btn:not(:disabled):active {
-    background: var(--touch-act);
-  }
+  .step-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .step-btn:not(:disabled):active { background: var(--touch-act); }
 
   .stepper-value {
     min-width: 34px;
@@ -386,9 +396,7 @@
     white-space: nowrap;
   }
 
-  .custom-submit-btn:active {
-    filter: brightness(0.9);
-  }
+  .custom-submit-btn:active { filter: brightness(0.9); }
 
   .done-box {
     text-align: center;
@@ -415,14 +423,11 @@
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
-    transition: opacity 150ms ease;
   }
 
-  .done-reset:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
+  .done-reset:disabled { opacity: 0.5; cursor: default; }
 
+  /* فقط در مرورگر معمولی و portrait */
   .orient-hint {
     display: none;
     position: fixed;
@@ -438,7 +443,7 @@
     line-height: 2;
   }
 
-  @media (orientation: portrait) {
+  @media (orientation: portrait) and (display-mode: browser) {
     .orient-hint { display: flex; }
   }
 </style>
@@ -446,9 +451,7 @@
 
 <body>
 
-<div class="orient-hint">
-  📱 لطفاً گوشی را افقی بگیرید، بچرخانید و زیر مهر قرار دهید
-</div>
+<div class="orient-hint">📱 لطفاً گوشی را افقی بگیرید</div>
 
 <div class="app-container">
 
@@ -461,24 +464,12 @@
     <div class="select-box">
       <div class="select-title">انتخاب نوع نماز</div>
       <div class="select-description">نماز واجب را انتخاب کنید یا تعداد رکعت دلخواه را تنظیم نمایید:</div>
-
       <div class="prayer-options">
-        <button class="prayer-btn" data-prayer="صبح" data-rakaat="2" data-type="معمولی">
-          صبح <span>(۲ رکعت)</span>
-        </button>
-        <button class="prayer-btn" data-prayer="ظهر" data-rakaat="4" data-type="معمولی">
-          ظهر <span>(۴ رکعت)</span>
-        </button>
-        <button class="prayer-btn" data-prayer="عصر" data-rakaat="4" data-type="معمولی">
-          عصر <span>(۴ رکعت)</span>
-        </button>
-        <button class="prayer-btn" data-prayer="مغرب" data-rakaat="3" data-type="معمولی">
-          مغرب <span>(۳ رکعت)</span>
-        </button>
-        <button class="prayer-btn" data-prayer="عشا" data-rakaat="4" data-type="معمولی">
-          عشا <span>(۴ رکعت)</span>
-        </button>
-
+        <button class="prayer-btn" data-prayer="صبح"  data-rakaat="2" data-type="معمولی">صبح  <span>(۲ رکعت)</span></button>
+        <button class="prayer-btn" data-prayer="ظهر"  data-rakaat="4" data-type="معمولی">ظهر  <span>(۴ رکعت)</span></button>
+        <button class="prayer-btn" data-prayer="عصر"  data-rakaat="4" data-type="معمولی">عصر  <span>(۴ رکعت)</span></button>
+        <button class="prayer-btn" data-prayer="مغرب" data-rakaat="3" data-type="معمولی">مغرب <span>(۳ رکعت)</span></button>
+        <button class="prayer-btn" data-prayer="عشا"  data-rakaat="4" data-type="معمولی">عشا  <span>(۴ رکعت)</span></button>
         <div class="custom-section">
           <span class="stepper-label">رکعت دلخواه:</span>
           <div class="stepper-controls">
@@ -515,13 +506,11 @@
       <span class="counter-label">سجده</span>
       <span class="counter-value" id="sajdeh-val">0</span>
     </div>
-
     <button class="reset-btn-inline" id="resetBtn">
       <span>ریست شمارنده</span>
-      <span style="font-size:9px; opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
+      <span style="font-size:9px;opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
       <div class="reset-progress" id="resetProgress"></div>
     </button>
-
     <div class="counter-card rakaat">
       <span class="counter-label">رکعت</span>
       <span class="counter-value" id="rakaat-val">0</span>
@@ -532,124 +521,77 @@
 
 <script>
 (() => {
-  const DEBOUNCE_MS = 3000;
+  const DEBOUNCE_MS  = 3000;
   const RESET_HOLD_MS = 1500;
 
-  let sajdeh = 0;
-  let rakaat = 0;
-  let maxRakaat = 0;
-  let selectedPrayer = '';
-  let prayerType = '';
-  let isActive = false;
-  let isFinished = false;
-  let activePointerId = null;
-  let lastCountedAt = null;
+  let sajdeh = 0, rakaat = 0, maxRakaat = 0;
+  let selectedPrayer = '', prayerType = '';
+  let isActive = false, isFinished = false;
+  let activePointerId = null, lastCountedAt = null;
   let wakeLock = null;
-
   let customRakaatCount = 1;
   let cooldownAnimFrame = null;
-  let resetStartTime = null;
-  let progressAnimFrame = null;
-  let activeResetPointerId = null;
-
-  const sajdehEl = document.getElementById('sajdeh-val');
-  const rakaatEl = document.getElementById('rakaat-val');
-  const zone = document.getElementById('touchZone');
-  const touchMainLabel = document.getElementById('touchMainLabel');
-  const touchSubLabel = document.getElementById('touchSubLabel');
-  const cooldownBgFill = document.getElementById('cooldownBgFill');
-  const flashEl = document.getElementById('flash');
-  const resetBtn = document.getElementById('resetBtn');
-  const resetProgress = document.getElementById('resetProgress');
-  const selectOverlay = document.getElementById('selectOverlay');
-  const doneOverlay = document.getElementById('doneOverlay');
-  const doneText = document.getElementById('doneText');
-  const doneResetBtn = document.getElementById('doneResetBtn');
-  const currentPrayerLabel = document.getElementById('currentPrayerLabel');
-  const prayerButtons = document.querySelectorAll('.prayer-btn[data-prayer]');
-  const fullscreenToggleBtn = document.getElementById('fullscreenToggleBtn');
-
-  const decRakaatBtn = document.getElementById('decRakaatBtn');
-  const incRakaatBtn = document.getElementById('incRakaatBtn');
-  const customRakaatDisplay = document.getElementById('customRakaatDisplay');
-  const customSubmitBtn = document.getElementById('customSubmitBtn');
-
+  let resetStartTime = null, progressAnimFrame = null, activeResetPointerId = null;
   let audioCtx = null;
-  function ensureAudioUnlocked() {
+
+  const $ = id => document.getElementById(id);
+  const sajdehEl          = $('sajdeh-val');
+  const rakaatEl          = $('rakaat-val');
+  const zone              = $('touchZone');
+  const touchMainLabel    = $('touchMainLabel');
+  const touchSubLabel     = $('touchSubLabel');
+  const cooldownBgFill    = $('cooldownBgFill');
+  const flashEl           = $('flash');
+  const resetBtn          = $('resetBtn');
+  const resetProgress     = $('resetProgress');
+  const selectOverlay     = $('selectOverlay');
+  const doneOverlay       = $('doneOverlay');
+  const doneText          = $('doneText');
+  const doneResetBtn      = $('doneResetBtn');
+  const currentPrayerLabel= $('currentPrayerLabel');
+  const fullscreenToggleBtn=$('fullscreenToggleBtn');
+  const decRakaatBtn      = $('decRakaatBtn');
+  const incRakaatBtn      = $('incRakaatBtn');
+  const customRakaatDisplay=$('customRakaatDisplay');
+  const customSubmitBtn   = $('customSubmitBtn');
+  const prayerButtons     = document.querySelectorAll('.prayer-btn[data-prayer]');
+
+  function ensureAudio() {
     try {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    } catch (_) {}
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch(_) {}
   }
 
   function playFinishSound() {
     try {
-      ensureAudioUnlocked();
+      ensureAudio();
       if (!audioCtx) return;
-
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
+      osc.connect(gain); gain.connect(audioCtx.destination);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
       osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15);
       gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.6);
-    } catch (_) {}
+      osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+    } catch(_) {}
   }
 
   async function requestWakeLock() {
     if (!('wakeLock' in navigator)) return;
     try {
-      if (wakeLock === null) {
+      if (!wakeLock) {
         wakeLock = await navigator.wakeLock.request('screen');
-        wakeLock.addEventListener('release', () => {
-          wakeLock = null;
-        });
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
       }
-    } catch (err) {}
+    } catch(_) {}
   }
 
   function releaseWakeLock() {
-    if (wakeLock !== null) {
-      wakeLock.release().then(() => { wakeLock = null; }).catch(() => {});
-    }
+    if (wakeLock) { wakeLock.release().catch(()=>{}); wakeLock = null; }
   }
-
-  fullscreenToggleBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else if (document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    }
-  });
-
-  incRakaatBtn.addEventListener('click', () => {
-    if (customRakaatCount < 50) {
-      customRakaatCount++;
-      customRakaatDisplay.textContent = customRakaatCount;
-      decRakaatBtn.disabled = false;
-    }
-  });
-
-  decRakaatBtn.addEventListener('click', () => {
-    if (customRakaatCount > 1) {
-      customRakaatCount--;
-      customRakaatDisplay.textContent = customRakaatCount;
-      if (customRakaatCount === 1) {
-        decRakaatBtn.disabled = true;
-      }
-    }
-  });
 
   function render() {
     sajdehEl.textContent = sajdeh;
@@ -663,222 +605,165 @@
   }
 
   function stopCooldown() {
-    if (cooldownAnimFrame) {
-      cancelAnimationFrame(cooldownAnimFrame);
-      cooldownAnimFrame = null;
-    }
+    if (cooldownAnimFrame) { cancelAnimationFrame(cooldownAnimFrame); cooldownAnimFrame = null; }
     cooldownBgFill.style.width = '0%';
     zone.classList.remove('cooldown');
     touchMainLabel.textContent = 'محل حساس به لمس';
-    touchSubLabel.textContent = 'لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود';
+    touchSubLabel.textContent  = 'لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود';
   }
 
   function startCooldownIndicator() {
     if (cooldownAnimFrame) cancelAnimationFrame(cooldownAnimFrame);
-
     zone.classList.add('cooldown');
     touchMainLabel.textContent = '⏳ در حال ثبت...';
-    touchSubLabel.textContent = 'آماده‌سازی لمس بعدی';
-
+    touchSubLabel.textContent  = 'آماده‌سازی لمس بعدی';
     const start = Date.now();
-
-    function step() {
+    (function step() {
       const elapsed = Date.now() - start;
-      const pct = Math.min((elapsed / DEBOUNCE_MS) * 100, 100);
-      cooldownBgFill.style.width = pct + '%';
-
-      if (elapsed < DEBOUNCE_MS) {
-        cooldownAnimFrame = requestAnimationFrame(step);
-      } else {
-        stopCooldown();
-      }
-    }
-
-    cooldownAnimFrame = requestAnimationFrame(step);
+      cooldownBgFill.style.width = Math.min((elapsed / DEBOUNCE_MS) * 100, 100) + '%';
+      if (elapsed < DEBOUNCE_MS) cooldownAnimFrame = requestAnimationFrame(step);
+      else stopCooldown();
+    })();
   }
 
   function startPrayer(name, rakaatCount, type = 'معمولی') {
-    ensureAudioUnlocked();
-
-    selectedPrayer = name;
-    maxRakaat = Number(rakaatCount);
-    prayerType = type;
-
-    rakaat = 1;
-    sajdeh = 0;
-    isActive = true;
-    isFinished = false;
-    lastCountedAt = null;
-
-    if (prayerType === 'مستحبی') {
-      currentPrayerLabel.textContent = `نماز مستحبی (${maxRakaat} رکعت)`;
-    } else {
-      currentPrayerLabel.textContent = `نماز ${selectedPrayer} (${maxRakaat} رکعت)`;
-    }
-
+    ensureAudio();
+    selectedPrayer = name; maxRakaat = Number(rakaatCount); prayerType = type;
+    rakaat = 1; sajdeh = 0; isActive = true; isFinished = false; lastCountedAt = null;
+    currentPrayerLabel.textContent = prayerType === 'مستحبی'
+      ? `نماز مستحبی (${maxRakaat} رکعت)`
+      : `نماز ${selectedPrayer} (${maxRakaat} رکعت)`;
     selectOverlay.classList.remove('show');
     doneOverlay.classList.remove('show');
-
     requestWakeLock();
     render();
   }
 
   function resetAndChoosePrayer() {
     stopCooldown();
-
-    sajdeh = 0;
-    rakaat = 0;
-    maxRakaat = 0;
-    selectedPrayer = '';
-    prayerType = '';
-    isActive = false;
-    isFinished = false;
-    activePointerId = null;
-    lastCountedAt = null;
-
+    sajdeh = 0; rakaat = 0; maxRakaat = 0;
+    selectedPrayer = ''; prayerType = '';
+    isActive = false; isFinished = false;
+    activePointerId = null; lastCountedAt = null;
     currentPrayerLabel.textContent = 'هنوز نمازی انتخاب نشده';
     zone.classList.remove('pressed');
     doneOverlay.classList.remove('show');
-
     releaseWakeLock();
     render();
     selectOverlay.classList.add('show');
-
     if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
-  }
-
-  function onPointerDown(e) {
-    e.preventDefault();
-    if (!isActive || isFinished) return;
-    if (activePointerId !== null) return;
-
-    activePointerId = e.pointerId;
-    zone.classList.add('pressed');
-    try { zone.setPointerCapture(e.pointerId); } catch (_) {}
-  }
-
-  function onPointerUp(e) {
-    e.preventDefault();
-    if (e.pointerId !== activePointerId) return;
-
-    activePointerId = null;
-    zone.classList.remove('pressed');
-
-    const now = Date.now();
-    if (lastCountedAt !== null && now - lastCountedAt < DEBOUNCE_MS) {
-      return;
-    }
-
-    lastCountedAt = now;
-    countSajdeh();
-  }
-
-  function onPointerCancel(e) {
-    if (e.pointerId !== activePointerId) return;
-    activePointerId = null;
-    zone.classList.remove('pressed');
   }
 
   function countSajdeh() {
     if (!isActive || isFinished) return;
-
     if (sajdeh === 0) {
       sajdeh = 1;
     } else if (sajdeh === 1) {
       sajdeh = 2;
     } else {
-      if (rakaat < maxRakaat) {
-        rakaat++;
-        sajdeh = 1;
-      } else {
-        rakaat = maxRakaat;
-        sajdeh = 2;
-        isFinished = true;
-
-        stopCooldown();
-        render();
-        triggerFlash();
-        playFinishSound();
-
-        const titleText = prayerType === 'مستحبی' ? `نماز مستحبی (${maxRakaat} رکعت)` : `نماز ${selectedPrayer}`;
-        doneText.innerHTML = `${titleText} کامل شد 🌙<br>${maxRakaat} رکعت تمام`;
+      if (rakaat < maxRakaat) { rakaat++; sajdeh = 1; }
+      else {
+        rakaat = maxRakaat; sajdeh = 2; isFinished = true;
+        stopCooldown(); render(); triggerFlash(); playFinishSound();
+        const title = prayerType === 'مستحبی'
+          ? `نماز مستحبی (${maxRakaat} رکعت)`
+          : `نماز ${selectedPrayer}`;
+        doneText.innerHTML = `${title} کامل شد 🌙<br>${maxRakaat} رکعت تمام`;
         doneOverlay.classList.add('show');
         return;
       }
     }
-
-    triggerFlash();
-    render();
-    startCooldownIndicator();
+    triggerFlash(); render(); startCooldownIndicator();
   }
 
-  // اتصال رویداد دکمه‌های نمازهای اصلی
-  prayerButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const p = btn.getAttribute('data-prayer');
-      const r = btn.getAttribute('data-rakaat');
-      const t = btn.getAttribute('data-type');
-      startPrayer(p, r, t);
-    });
+  // Touch zone events
+  zone.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (!isActive || isFinished || activePointerId !== null) return;
+    activePointerId = e.pointerId;
+    zone.classList.add('pressed');
+    try { zone.setPointerCapture(e.pointerId); } catch(_) {}
   });
 
-  // اتصال رویداد نماز دلخواه / مستحبی
-  customSubmitBtn.addEventListener('click', () => {
-    startPrayer('مستحبی', customRakaatCount, 'مستحبی');
+  zone.addEventListener('pointerup', e => {
+    e.preventDefault();
+    if (e.pointerId !== activePointerId) return;
+    activePointerId = null;
+    zone.classList.remove('pressed');
+    const now = Date.now();
+    if (lastCountedAt !== null && now - lastCountedAt < DEBOUNCE_MS) return;
+    lastCountedAt = now;
+    countSajdeh();
   });
 
-  // لمس منطقه اصلی شمارنده
-  zone.addEventListener('pointerdown', onPointerDown);
-  zone.addEventListener('pointerup', onPointerUp);
-  zone.addEventListener('pointercancel', onPointerCancel);
+  zone.addEventListener('pointercancel', e => {
+    if (e.pointerId !== activePointerId) return;
+    activePointerId = null;
+    zone.classList.remove('pressed');
+  });
 
-  // دکمه ریست
+  // Reset button hold
   function cancelResetHold() {
-    if (progressAnimFrame) {
-      cancelAnimationFrame(progressAnimFrame);
-      progressAnimFrame = null;
-    }
+    if (progressAnimFrame) { cancelAnimationFrame(progressAnimFrame); progressAnimFrame = null; }
     resetProgress.style.width = '0%';
-    resetStartTime = null;
-    activeResetPointerId = null;
+    resetStartTime = null; activeResetPointerId = null;
   }
 
-  resetBtn.addEventListener('pointerdown', (e) => {
+  resetBtn.addEventListener('pointerdown', e => {
     e.preventDefault();
     if (activeResetPointerId !== null) return;
-
     activeResetPointerId = e.pointerId;
-    try { resetBtn.setPointerCapture(e.pointerId); } catch (_) {}
+    try { resetBtn.setPointerCapture(e.pointerId); } catch(_) {}
     resetStartTime = Date.now();
-
-    function updateProgress() {
+    (function update() {
       const elapsed = Date.now() - resetStartTime;
-      const pct = Math.min((elapsed / RESET_HOLD_MS) * 100, 100);
-      resetProgress.style.width = pct + '%';
-
-      if (elapsed >= RESET_HOLD_MS) {
-        cancelResetHold();
-        resetAndChoosePrayer();
-      } else {
-        progressAnimFrame = requestAnimationFrame(updateProgress);
-      }
-    }
-
-    progressAnimFrame = requestAnimationFrame(updateProgress);
+      resetProgress.style.width = Math.min((elapsed / RESET_HOLD_MS) * 100, 100) + '%';
+      if (elapsed >= RESET_HOLD_MS) { cancelResetHold(); resetAndChoosePrayer(); }
+      else progressAnimFrame = requestAnimationFrame(update);
+    })();
   });
 
-  resetBtn.addEventListener('pointerup', cancelResetHold);
+  resetBtn.addEventListener('pointerup',     cancelResetHold);
   resetBtn.addEventListener('pointercancel', cancelResetHold);
 
-  // دکمه نماز جدید در انتهای نماز (همراه با تاخیر کوچک برای لمس تصادفی)
-  doneResetBtn.addEventListener('click', () => {
-    resetAndChoosePrayer();
+  // Fullscreen
+  fullscreenToggleBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen)
+      document.documentElement.requestFullscreen().catch(()=>{});
+    else if (document.exitFullscreen)
+      document.exitFullscreen().catch(()=>{});
   });
 
-  // تنظیم اولیه
+  // Stepper
+  incRakaatBtn.addEventListener('click', () => {
+    if (customRakaatCount < 50) {
+      customRakaatCount++;
+      customRakaatDisplay.textContent = customRakaatCount;
+      decRakaatBtn.disabled = false;
+    }
+  });
+
+  decRakaatBtn.addEventListener('click', () => {
+    if (customRakaatCount > 1) {
+      customRakaatCount--;
+      customRakaatDisplay.textContent = customRakaatCount;
+      if (customRakaatCount === 1) decRakaatBtn.disabled = true;
+    }
+  });
+
+  // Prayer selection
+  prayerButtons.forEach(btn => btn.addEventListener('click', () =>
+    startPrayer(btn.dataset.prayer, btn.dataset.rakaat, btn.dataset.type)
+  ));
+
+  customSubmitBtn.addEventListener('click', () =>
+    startPrayer('مستحبی', customRakaatCount, 'مستحبی')
+  );
+
+  doneResetBtn.addEventListener('click', resetAndChoosePrayer);
+
   render();
 })();
 </script>
-
 </body>
 </html>

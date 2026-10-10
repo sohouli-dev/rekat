@@ -8,33 +8,6 @@
 <meta name="theme-color" content="#111827">
 <title>رکعت شمار پرهام</title>
 
-<script>
-(function() {
-  const manifest = {
-    name: "رکعت شمار پرهام",
-    short_name: "رکعت شمار",
-    display: "standalone",
-    orientation: "landscape-primary",
-    start_url: "./",
-    background_color: "#111827",
-    theme_color: "#111827",
-    icons: [
-      {
-        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23111827'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' fill='%2372c472'%3E%D8%B1%3C/text%3E%3C/svg%3E",
-        sizes: "192x192",
-        type: "image/svg+xml"
-      }
-    ]
-  };
-  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = url;
-  document.currentScript.parentNode.appendChild(link);
-})();
-</script>
-
 <style>
   *, *::before, *::after {
     box-sizing: border-box;
@@ -44,20 +17,20 @@
   }
 
   :root {
-    --bg:          oklch(14% 0.02 265);
-    --surface:     oklch(20% 0.025 265);
-    --border:      oklch(32% 0.03 265);
-    --text:        oklch(93% 0.01 265);
-    --muted:       oklch(58% 0.02 265);
-    --accent:      oklch(72% 0.18 145);
-    --accent2:     oklch(68% 0.18 265);
-    --danger:      oklch(68% 0.18 25);
-    --danger-bg:   oklch(22% 0.04 25);
-    --touch-bg:    oklch(23% 0.035 265);
-    --touch-act:   oklch(34% 0.06 265);
-    --touch-wait:  oklch(18% 0.03 265);
-    --r-lg: 20px;
-    --r-xl: 24px;
+    --bg: #111827;
+    --surface: #1f2937;
+    --border: #374151;
+    --text: #f9fafb;
+    --muted: #9ca3af;
+    --accent: #10b981;
+    --accent2: #6366f1;
+    --danger: #ef4444;
+    --danger-bg: #450a0a;
+    --touch-bg: #1e293b;
+    --touch-act: #334155;
+    --touch-wait: #0f172a;
+    --r-lg: 16px;
+    --r-xl: 20px;
   }
 
   html, body {
@@ -67,7 +40,6 @@
     font-family: 'Segoe UI', Tahoma, system-ui, -apple-system, sans-serif;
     color: var(--text);
     overflow: hidden;
-    touch-action: none;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -79,6 +51,7 @@
     display: flex;
     flex-direction: column;
     padding: 12px 16px;
+    transform: rotate(180deg);
   }
 
   .top-status-bar {
@@ -103,11 +76,8 @@
     border-radius: 8px;
     padding: 2px 8px;
     font-size: 11px;
-    font-family: inherit;
     cursor: pointer;
   }
-
-  .fullscreen-btn:active { background: var(--surface); }
 
   .touch-wrap {
     flex: 1;
@@ -129,28 +99,22 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    touch-action: none;
     position: relative;
     overflow: hidden;
-    transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
-  }
-
-  .touch-zone.pressed {
-    background: var(--touch-act);
-    border-color: var(--accent);
-    transform: scale(0.985);
   }
 
   .touch-zone.cooldown {
     background: var(--touch-wait);
-    border-color: oklch(45% 0.08 265);
+    border-color: #4b5563;
   }
 
   .cooldown-bg-fill {
     position: absolute;
-    top: 0; bottom: 0; right: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
     width: 0%;
-    background: oklch(68% 0.18 265 / 22%);
+    background: rgba(99, 102, 241, 0.25);
     pointer-events: none;
     z-index: 1;
   }
@@ -176,7 +140,6 @@
   .touch-sublabel {
     font-size: 12px;
     color: var(--muted);
-    opacity: 0.8;
     margin-top: 4px;
   }
 
@@ -184,13 +147,15 @@
     position: absolute;
     inset: 0;
     border-radius: var(--r-xl);
-    background: oklch(72% 0.18 145 / 20%);
+    background: rgba(16, 185, 129, 0.25);
     opacity: 0;
     pointer-events: none;
     z-index: 3;
   }
 
-  .flash.go { animation: flash-anim 250ms ease forwards; }
+  .flash.go {
+    animation: flash-anim 250ms ease forwards;
+  }
 
   @keyframes flash-anim {
     0%   { opacity: 1; }
@@ -228,7 +193,6 @@
     font-size: 44px;
     font-weight: 800;
     line-height: 1;
-    font-variant-numeric: tabular-nums;
   }
 
   .counter-card.sajdeh .counter-value { color: var(--accent2); }
@@ -238,27 +202,23 @@
     flex: 1.2;
     background: var(--danger-bg);
     color: var(--danger);
-    border: 1.5px solid oklch(40% 0.1 25);
+    border: 1.5px solid #7f1d1d;
     border-radius: var(--r-lg);
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
-    font-family: inherit;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    line-height: 1.3;
-    padding: 4px;
     position: relative;
     overflow: hidden;
-    touch-action: none;
   }
 
   .reset-progress {
     position: absolute;
-    bottom: 0; right: 0;
+    bottom: 0;
+    right: 0;
     width: 0%;
     height: 4px;
     background: var(--danger);
@@ -266,16 +226,18 @@
 
   .select-overlay, .done-overlay {
     display: none;
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background: oklch(8% 0 0 / 95%);
+    background: rgba(10, 10, 15, 0.96);
     align-items: center;
     justify-content: center;
     padding: 16px;
-    z-index: 100;
+    z-index: 9999;
   }
 
-  .select-overlay.show, .done-overlay.show { display: flex; }
+  .select-overlay.show, .done-overlay.show {
+    display: flex !important;
+  }
 
   .select-box {
     width: min(500px, 100%);
@@ -310,7 +272,6 @@
     border-radius: 12px;
     background: var(--touch-bg);
     color: var(--text);
-    font-family: inherit;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -321,13 +282,9 @@
     gap: 2px;
   }
 
-  .prayer-btn span {
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: normal;
+  .prayer-btn:active {
+    background: var(--touch-act);
   }
-
-  .prayer-btn:active { background: var(--touch-act); }
 
   .custom-section {
     grid-column: 1 / -1;
@@ -344,8 +301,6 @@
   .stepper-label {
     font-size: 12px;
     color: var(--muted);
-    font-weight: 600;
-    white-space: nowrap;
   }
 
   .stepper-controls {
@@ -355,27 +310,20 @@
   }
 
   .step-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     border: 1.5px solid var(--border);
     background: var(--touch-bg);
     color: var(--text);
     font-size: 18px;
     font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     cursor: pointer;
-    font-family: inherit;
   }
 
-  .step-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .step-btn:not(:disabled):active { background: var(--touch-act); }
-
   .stepper-value {
-    min-width: 34px;
-    font-size: 20px;
+    min-width: 30px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--accent);
     text-align: center;
@@ -383,19 +331,15 @@
 
   .custom-submit-btn {
     flex: 1;
-    height: 38px;
+    height: 36px;
     background: var(--accent);
-    color: oklch(14% 0.02 145);
+    color: #064e3b;
     border: none;
-    border-radius: 10px;
-    font-family: inherit;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    white-space: nowrap;
   }
-
-  .custom-submit-btn:active { filter: brightness(0.9); }
 
   .done-box {
     text-align: center;
@@ -415,32 +359,29 @@
   .done-reset {
     padding: 12px 32px;
     background: var(--accent);
-    color: oklch(14% 0.02 145);
+    color: #064e3b;
     border: none;
     border-radius: 999px;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    font-family: inherit;
   }
 
-  /* فقط در مرورگر معمولی و portrait */
   .orient-hint {
     display: none;
     position: fixed;
     inset: 0;
-    background: oklch(8% 0 0 / 96%);
+    background: rgba(10, 10, 15, 0.98);
     color: var(--text);
     font-size: 18px;
     align-items: center;
     justify-content: center;
     text-align: center;
     padding: 32px;
-    z-index: 999;
-    line-height: 2;
+    z-index: 99999;
   }
 
-  @media (orientation: portrait) and (display-mode: browser) {
+  @media (orientation: portrait) {
     .orient-hint { display: flex; }
   }
 </style>
@@ -448,7 +389,9 @@
 
 <body>
 
-<div class="orient-hint">📱 لطفاً گوشی را افقی بگیرید</div>
+<div class="orient-hint">
+  📱 لطفاً گوشی را افقی بگیرید
+</div>
 
 <div class="app-container">
 
@@ -460,21 +403,23 @@
   <div class="select-overlay show" id="selectOverlay">
     <div class="select-box">
       <div class="select-title">انتخاب نوع نماز</div>
-      <div class="select-description">نماز واجب را انتخاب کنید یا تعداد رکعت دلخواه را تنظیم نمایید:</div>
+      <div class="select-description">یک نماز را انتخاب کنید:</div>
+
       <div class="prayer-options">
-        <button class="prayer-btn" data-prayer="صبح"  data-rakaat="2" data-type="معمولی">صبح  <span>(۲ رکعت)</span></button>
-        <button class="prayer-btn" data-prayer="ظهر"  data-rakaat="4" data-type="معمولی">ظهر  <span>(۴ رکعت)</span></button>
-        <button class="prayer-btn" data-prayer="عصر"  data-rakaat="4" data-type="معمولی">عصر  <span>(۴ رکعت)</span></button>
-        <button class="prayer-btn" data-prayer="مغرب" data-rakaat="3" data-type="معمولی">مغرب <span>(۳ رکعت)</span></button>
-        <button class="prayer-btn" data-prayer="عشا"  data-rakaat="4" data-type="معمولی">عشا  <span>(۴ رکعت)</span></button>
+        <button type="button" class="prayer-btn" onclick="startPrayer('صبح', 2)">صبح (۲ رکعت)</button>
+        <button type="button" class="prayer-btn" onclick="startPrayer('ظهر', 4)">ظهر (۴ رکعت)</button>
+        <button type="button" class="prayer-btn" onclick="startPrayer('عصر', 4)">عصر (۴ رکعت)</button>
+        <button type="button" class="prayer-btn" onclick="startPrayer('مغرب', 3)">مغرب (۳ رکعت)</button>
+        <button type="button" class="prayer-btn" onclick="startPrayer('عشا', 4)">عشا (۴ رکعت)</button>
+
         <div class="custom-section">
-          <span class="stepper-label">رکعت دلخواه:</span>
+          <span class="stepper-label">رکعت:</span>
           <div class="stepper-controls">
-            <button class="step-btn" id="decRakaatBtn" disabled>−</button>
+            <button type="button" class="step-btn" onclick="changeCustom(-1)">−</button>
             <span class="stepper-value" id="customRakaatDisplay">1</span>
-            <button class="step-btn" id="incRakaatBtn">+</button>
+            <button type="button" class="step-btn" onclick="changeCustom(1)">+</button>
           </div>
-          <button class="custom-submit-btn" id="customSubmitBtn">شروع مستحبی</button>
+          <button type="button" class="custom-submit-btn" onclick="startCustomPrayer()">شروع مستحبی</button>
         </div>
       </div>
     </div>
@@ -483,12 +428,12 @@
   <div class="done-overlay" id="doneOverlay">
     <div class="done-box">
       <div class="done-text" id="doneText"></div>
-      <button class="done-reset" id="doneResetBtn">نماز جدید</button>
+      <button class="done-reset" onclick="resetAndChoosePrayer()">نماز جدید</button>
     </div>
   </div>
 
   <div class="touch-wrap">
-    <div class="touch-zone" id="touchZone">
+    <div class="touch-zone" id="touchZone" onclick="handleTouchClick()">
       <div class="cooldown-bg-fill" id="cooldownBgFill"></div>
       <div class="touch-content-wrapper">
         <span class="touch-label" id="touchMainLabel">محل حساس به لمس</span>
@@ -503,11 +448,13 @@
       <span class="counter-label">سجده</span>
       <span class="counter-value" id="sajdeh-val">0</span>
     </div>
+
     <button class="reset-btn-inline" id="resetBtn">
       <span>ریست شمارنده</span>
-      <span style="font-size:9px;opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
+      <span style="font-size:9px; opacity:0.8;">(نگه داشتن ۱.۵ ثانیه)</span>
       <div class="reset-progress" id="resetProgress"></div>
     </button>
+
     <div class="counter-card rakaat">
       <span class="counter-label">رکعت</span>
       <span class="counter-value" id="rakaat-val">0</span>
@@ -517,277 +464,156 @@
 </div>
 
 <script>
-(() => {
-  const DEBOUNCE_MS   = 3000;
-  const RESET_HOLD_MS = 1500;
-
-  let sajdeh = 0, rakaat = 0, maxRakaat = 0;
-  let selectedPrayer = '', prayerType = '';
-  let isActive = false, isFinished = false;
-  let activePointerId = null, lastCountedAt = null;
-  let wakeLock = null;
+  let sajdeh = 0;
+  let rakaat = 0;
+  let maxRakaat = 0;
+  let selectedPrayer = '';
+  let isActive = false;
+  let isFinished = false;
+  let lastCountedAt = 0;
   let customRakaatCount = 1;
-  let cooldownAnimFrame = null;
-  let resetStartTime = null, progressAnimFrame = null, activeResetPointerId = null;
-  let audioCtx = null;
+  const DEBOUNCE_MS = 3000;
 
-  const $ = id => document.getElementById(id);
-  const sajdehEl           = $('sajdeh-val');
-  const rakaatEl           = $('rakaat-val');
-  const zone               = $('touchZone');
-  const touchMainLabel     = $('touchMainLabel');
-  const touchSubLabel      = $('touchSubLabel');
-  const cooldownBgFill     = $('cooldownBgFill');
-  const flashEl            = $('flash');
-  const resetBtn           = $('resetBtn');
-  const resetProgress      = $('resetProgress');
-  const selectOverlay      = $('selectOverlay');
-  const doneOverlay        = $('doneOverlay');
-  const doneText           = $('doneText');
-  const doneResetBtn       = $('doneResetBtn');
-  const currentPrayerLabel = $('currentPrayerLabel');
-  const fullscreenToggleBtn= $('fullscreenToggleBtn');
-  const decRakaatBtn       = $('decRakaatBtn');
-  const incRakaatBtn       = $('incRakaatBtn');
-  const customRakaatDisplay= $('customRakaatDisplay');
-  const customSubmitBtn    = $('customSubmitBtn');
-  const prayerButtons      = document.querySelectorAll('.prayer-btn[data-prayer]');
-
-  // ── Orientation lock ──────────────────────────────────────────
-  async function lockOrientation() {
-    try {
-      if (screen.orientation && typeof screen.orientation.lock === 'function') {
-        await screen.orientation.lock('landscape-primary');
-      }
-    } catch(_) {
-      // فقط در PWA standalone یا fullscreen کار می‌کنه؛ خطا نادیده گرفته میشه
-    }
-  }
-
-  function unlockOrientation() {
-    try {
-      if (screen.orientation && typeof screen.orientation.unlock === 'function') {
-        screen.orientation.unlock();
-      }
-    } catch(_) {}
-  }
-
-  // ── Wake lock ─────────────────────────────────────────────────
-  async function requestWakeLock() {
-    if (!('wakeLock' in navigator)) return;
-    try {
-      if (!wakeLock) {
-        wakeLock = await navigator.wakeLock.request('screen');
-        wakeLock.addEventListener('release', () => { wakeLock = null; });
-      }
-    } catch(_) {}
-  }
-
-  function releaseWakeLock() {
-    if (wakeLock) { wakeLock.release().catch(()=>{}); wakeLock = null; }
-  }
-
-  // ── Audio ─────────────────────────────────────────────────────
-  function ensureAudio() {
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    } catch(_) {}
-  }
-
-  function playFinishSound() {
-    try {
-      ensureAudio();
-      if (!audioCtx) return;
-      const osc  = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.6);
-    } catch(_) {}
-  }
-
-  // ── UI helpers ────────────────────────────────────────────────
   function render() {
-    sajdehEl.textContent = sajdeh;
-    rakaatEl.textContent = rakaat;
+    document.getElementById('sajdeh-val').textContent = sajdeh;
+    document.getElementById('rakaat-val').textContent = rakaat;
   }
 
-  function triggerFlash() {
-    flashEl.classList.remove('go');
-    void flashEl.offsetWidth;
-    flashEl.classList.add('go');
+  function changeCustom(delta) {
+    customRakaatCount = Math.max(1, Math.min(50, customRakaatCount + delta));
+    document.getElementById('customRakaatDisplay').textContent = customRakaatCount;
   }
 
-  function stopCooldown() {
-    if (cooldownAnimFrame) { cancelAnimationFrame(cooldownAnimFrame); cooldownAnimFrame = null; }
-    cooldownBgFill.style.width = '0%';
-    zone.classList.remove('cooldown');
-    touchMainLabel.textContent = 'محل حساس به لمس';
-    touchSubLabel.textContent  = 'لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود';
+  function startCustomPrayer() {
+    startPrayer('مستحبی', customRakaatCount);
   }
 
-  function startCooldownIndicator() {
-    if (cooldownAnimFrame) cancelAnimationFrame(cooldownAnimFrame);
-    zone.classList.add('cooldown');
-    touchMainLabel.textContent = '⏳ در حال ثبت...';
-    touchSubLabel.textContent  = 'آماده‌سازی لمس بعدی';
-    const start = Date.now();
-    (function step() {
-      const elapsed = Date.now() - start;
-      cooldownBgFill.style.width = Math.min((elapsed / DEBOUNCE_MS) * 100, 100) + '%';
-      if (elapsed < DEBOUNCE_MS) cooldownAnimFrame = requestAnimationFrame(step);
-      else stopCooldown();
-    })();
-  }
+  function startPrayer(name, rakaatCount) {
+    selectedPrayer = name;
+    maxRakaat = rakaatCount;
+    rakaat = 1;
+    sajdeh = 0;
+    isActive = true;
+    isFinished = false;
+    lastCountedAt = 0;
 
-  // ── Prayer start / reset ──────────────────────────────────────
-  function startPrayer(name, rakaatCount, type = 'معمولی') {
-    ensureAudio();
-    selectedPrayer = name; maxRakaat = Number(rakaatCount); prayerType = type;
-    rakaat = 1; sajdeh = 0; isActive = true; isFinished = false; lastCountedAt = null;
-    currentPrayerLabel.textContent = prayerType === 'مستحبی'
-      ? `نماز مستحبی (${maxRakaat} رکعت)`
-      : `نماز ${selectedPrayer} (${maxRakaat} رکعت)`;
-    selectOverlay.classList.remove('show');
-    doneOverlay.classList.remove('show');
-    requestWakeLock();
-    lockOrientation();   // ← قفل landscape-primary هنگام شروع نماز
+    document.getElementById('currentPrayerLabel').textContent = `نماز ${selectedPrayer} (${maxRakaat} رکعت)`;
+    document.getElementById('selectOverlay').classList.remove('show');
+    document.getElementById('doneOverlay').classList.remove('show');
+
     render();
   }
 
-  function resetAndChoosePrayer() {
-    stopCooldown();
-    sajdeh = 0; rakaat = 0; maxRakaat = 0;
-    selectedPrayer = ''; prayerType = '';
-    isActive = false; isFinished = false;
-    activePointerId = null; lastCountedAt = null;
-    currentPrayerLabel.textContent = 'هنوز نمازی انتخاب نشده';
-    zone.classList.remove('pressed');
-    doneOverlay.classList.remove('show');
-    releaseWakeLock();
-    unlockOrientation(); // ← آزاد کردن جهت پس از اتمام یا ریست
-    render();
-    selectOverlay.classList.add('show');
-    if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
-  }
-
-  // ── Count logic ───────────────────────────────────────────────
-  function countSajdeh() {
+  function handleTouchClick() {
     if (!isActive || isFinished) return;
+
+    const now = Date.now();
+    if (now - lastCountedAt < DEBOUNCE_MS) return;
+    lastCountedAt = now;
+
     if (sajdeh === 0) {
       sajdeh = 1;
     } else if (sajdeh === 1) {
       sajdeh = 2;
     } else {
-      if (rakaat < maxRakaat) { rakaat++; sajdeh = 1; }
-      else {
-        rakaat = maxRakaat; sajdeh = 2; isFinished = true;
-        stopCooldown(); render(); triggerFlash(); playFinishSound();
-        const title = prayerType === 'مستحبی'
-          ? `نماز مستحبی (${maxRakaat} رکعت)`
-          : `نماز ${selectedPrayer}`;
-        doneText.innerHTML = `${title} کامل شد 🌙<br>${maxRakaat} رکعت تمام`;
-        doneOverlay.classList.add('show');
-        unlockOrientation(); // ← آزاد کردن جهت پس از اتمام نماز
+      if (rakaat < maxRakaat) {
+        rakaat++;
+        sajdeh = 1;
+      } else {
+        rakaat = maxRakaat;
+        sajdeh = 2;
+        isFinished = true;
+        render();
+        document.getElementById('doneText').innerHTML = `نماز ${selectedPrayer} کامل شد 🌙<br>${maxRakaat} رکعت تمام`;
+        document.getElementById('doneOverlay').classList.add('show');
         return;
       }
     }
-    triggerFlash(); render(); startCooldownIndicator();
+
+    // افکت فلش
+    const flash = document.getElementById('flash');
+    flash.classList.remove('go');
+    void flash.offsetWidth;
+    flash.classList.add('go');
+
+    render();
+
+    // انیمیشن کول‌داون ۳ ثانیه
+    const cooldownFill = document.getElementById('cooldownBgFill');
+    const start = Date.now();
+    const zone = document.getElementById('touchZone');
+    zone.classList.add('cooldown');
+
+    function animateCooldown() {
+      const elapsed = Date.now() - start;
+      const pct = Math.min((elapsed / DEBOUNCE_MS) * 100, 100);
+      cooldownFill.style.width = pct + '%';
+      if (elapsed < DEBOUNCE_MS) {
+        requestAnimationFrame(animateCooldown);
+      } else {
+        cooldownFill.style.width = '0%';
+        zone.classList.remove('cooldown');
+      }
+    }
+    requestAnimationFrame(animateCooldown);
   }
 
-  // ── Touch zone events ─────────────────────────────────────────
-  zone.addEventListener('pointerdown', e => {
-    e.preventDefault();
-    if (!isActive || isFinished || activePointerId !== null) return;
-    activePointerId = e.pointerId;
-    zone.classList.add('pressed');
-    try { zone.setPointerCapture(e.pointerId); } catch(_) {}
-  });
+  function resetAndChoosePrayer() {
+    sajdeh = 0;
+    rakaat = 0;
+    maxRakaat = 0;
+    isActive = false;
+    isFinished = false;
+    document.getElementById('currentPrayerLabel').textContent = 'هنوز نمازی انتخاب نشده';
+    document.getElementById('doneOverlay').classList.remove('show');
+    document.getElementById('selectOverlay').classList.add('show');
+    render();
+  }
 
-  zone.addEventListener('pointerup', e => {
-    e.preventDefault();
-    if (e.pointerId !== activePointerId) return;
-    activePointerId = null;
-    zone.classList.remove('pressed');
-    const now = Date.now();
-    if (lastCountedAt !== null && now - lastCountedAt < DEBOUNCE_MS) return;
-    lastCountedAt = now;
-    countSajdeh();
-  });
+  // دکمه ریست با نگه‌داشتن ۱.۵ ثانیه
+  const resetBtn = document.getElementById('resetBtn');
+  const resetProgress = document.getElementById('resetProgress');
+  let resetTimer = null;
+  let resetStartTime = 0;
 
-  zone.addEventListener('pointercancel', e => {
-    if (e.pointerId !== activePointerId) return;
-    activePointerId = null;
-    zone.classList.remove('pressed');
-  });
-
-  // ── Reset button hold ─────────────────────────────────────────
-  function cancelResetHold() {
-    if (progressAnimFrame) { cancelAnimationFrame(progressAnimFrame); progressAnimFrame = null; }
+  function cancelReset() {
+    if (resetTimer) cancelAnimationFrame(resetTimer);
     resetProgress.style.width = '0%';
-    resetStartTime = null; activeResetPointerId = null;
   }
 
-  resetBtn.addEventListener('pointerdown', e => {
-    e.preventDefault();
-    if (activeResetPointerId !== null) return;
-    activeResetPointerId = e.pointerId;
-    try { resetBtn.setPointerCapture(e.pointerId); } catch(_) {}
+  function startResetHold() {
     resetStartTime = Date.now();
-    (function update() {
+    function tick() {
       const elapsed = Date.now() - resetStartTime;
-      resetProgress.style.width = Math.min((elapsed / RESET_HOLD_MS) * 100, 100) + '%';
-      if (elapsed >= RESET_HOLD_MS) { cancelResetHold(); resetAndChoosePrayer(); }
-      else progressAnimFrame = requestAnimationFrame(update);
-    })();
-  });
+      const pct = Math.min((elapsed / 1500) * 100, 100);
+      resetProgress.style.width = pct + '%';
+      if (elapsed >= 1500) {
+        cancelReset();
+        resetAndChoosePrayer();
+      } else {
+        resetTimer = requestAnimationFrame(tick);
+      }
+    }
+    resetTimer = requestAnimationFrame(tick);
+  }
 
-  resetBtn.addEventListener('pointerup',     cancelResetHold);
-  resetBtn.addEventListener('pointercancel', cancelResetHold);
+  resetBtn.addEventListener('mousedown', startResetHold);
+  resetBtn.addEventListener('mouseup', cancelReset);
+  resetBtn.addEventListener('mouseleave', cancelReset);
+  resetBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startResetHold(); });
+  resetBtn.addEventListener('touchend', cancelReset);
 
-  // ── Fullscreen ────────────────────────────────────────────────
-  fullscreenToggleBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement && document.documentElement.requestFullscreen)
-      document.documentElement.requestFullscreen().catch(()=>{});
-    else if (document.exitFullscreen)
-      document.exitFullscreen().catch(()=>{});
-  });
-
-  // ── Stepper ───────────────────────────────────────────────────
-  incRakaatBtn.addEventListener('click', () => {
-    if (customRakaatCount < 50) {
-      customRakaatCount++;
-      customRakaatDisplay.textContent = customRakaatCount;
-      decRakaatBtn.disabled = false;
+  // دکمه تمام‌صفحه
+  document.getElementById('fullscreenToggleBtn').addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
     }
   });
-
-  decRakaatBtn.addEventListener('click', () => {
-    if (customRakaatCount > 1) {
-      customRakaatCount--;
-      customRakaatDisplay.textContent = customRakaatCount;
-      if (customRakaatCount === 1) decRakaatBtn.disabled = true;
-    }
-  });
-
-  // ── Prayer selection ──────────────────────────────────────────
-  prayerButtons.forEach(btn => btn.addEventListener('click', () =>
-    startPrayer(btn.dataset.prayer, btn.dataset.rakaat, btn.dataset.type)
-  ));
-
-  customSubmitBtn.addEventListener('click', () =>
-    startPrayer('مستحبی', customRakaatCount, 'مستحبی')
-  );
-
-  doneResetBtn.addEventListener('click', resetAndChoosePrayer);
 
   render();
-})();
 </script>
+
 </body>
 </html>

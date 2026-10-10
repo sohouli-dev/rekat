@@ -2,1254 +2,724 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#111827">
-
   <title>رکعت شمار پرهام</title>
 
+  <!-- آیکون و تنظیمات PWA -->
   <link rel="icon" type="image/png" href="icon-512.png">
   <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="manifest" href="manifest.json">
 
   <style>
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
 
-    :root {
-      --bg: #111827;
-      --surface: #1f2937;
-      --border: #374151;
-      --text: #f9fafb;
-      --muted: #9ca3af;
-      --accent: #10b981;
-      --accent-dark: #064e3b;
-      --accent2: #6366f1;
-      --danger: #ef4444;
-      --danger-bg: #450a0a;
-      --touch-bg: #1e293b;
-      --touch-act: #334155;
-      --touch-wait: #0f172a;
-      --r-lg: 16px;
-      --r-xl: 20px;
-    }
-
-    html,
     body {
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        "Segoe UI",
-        Tahoma,
-        system-ui,
-        -apple-system,
-        sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
       overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    button {
-      font-family: inherit;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    .app-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 10px 14px;
     }
 
-    /* محل اصلی لمس */
+    /* هشدار حالت عمودی */
+    .orient-hint {
+      display: none;
+      background: #e11d48;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      z-index: 1000;
+    }
 
-    .touch-wrap {
-      position: relative;
-      flex: 1;
-      width: 100%;
+    @media (orientation: portrait) {
+      .orient-hint {
+        display: block;
+      }
+    }
+
+    /* نوار بالا */
+    .top-bar {
       display: flex;
-      overflow: hidden;
-      border-radius: var(--r-xl);
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      font-size: 0.85rem;
+      height: 44px;
+      flex-shrink: 0;
     }
 
-    .touch-zone {
+    .top-bar .title {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .top-bar .prayer-name {
+      color: #94a3b8;
+    }
+
+    .btn-change {
+      background: #334155;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-change:hover {
+      background: #475569;
+    }
+
+    /* بدنه اصلی برنامه */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       position: relative;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
+    }
+
+    .counter-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      padding: 10px 14px;
+      overflow: hidden;
+    }
+
+    /* منطقه لمس (Touch Zone) */
+    .touch-zone {
+      flex: 1;
+      background: #1e293b;
+      border: 2px dashed #475569;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .touch-zone:active {
+      background: #24344d;
+      border-color: #38bdf8;
+    }
+
+    .touch-zone .icon {
+      font-size: 2.5rem;
+      margin-bottom: 4px;
+    }
+
+    .touch-zone .label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .touch-zone .sub-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .touch-zone .status-text {
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    /* ستون شمارنده‌ها و دکمه‌ها */
+    .stats-sidebar {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .stat-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-card.active-sajdah {
+      border-color: #22c55e;
+      background: #143324;
+    }
+
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .stat-card .val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #f8fafc;
+      min-width: 45px;
+      text-align: left;
+    }
+
+    .sajdah-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .sajdah-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #334155;
+      border: 1px solid #64748b;
+    }
+
+    .sajdah-dot.filled {
+      background: #22c55e;
+      border-color: #4ade80;
+    }
+
+    /* دکمه‌های کنترلی با قابلیت نگه‌داشتن */
+    .control-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-hold-btn {
+      position: relative;
+      overflow: hidden;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 10px;
+      cursor: pointer;
+      color: #ffffff;
+      text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      background: var(--touch-bg);
-      border: 2px dashed var(--border);
-      border-radius: var(--r-xl);
-      cursor: pointer;
-      touch-action: manipulation;
+      font-family: inherit;
     }
 
-    .touch-zone.cooldown {
-      background: var(--touch-wait);
-      border-color: #4b5563;
-    }
-
-    .cooldown-bg-fill {
+    .action-hold-btn .progress-bar {
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       width: 0%;
-      background: rgba(99, 102, 241, 0.25);
-      pointer-events: none;
+      background: rgba(255, 255, 255, 0.25);
+      transition: width 0.05s linear;
+    }
+
+    .action-hold-btn span {
+      position: relative;
       z-index: 1;
     }
 
-    .touch-content-wrapper {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      pointer-events: none;
-      text-align: center;
-    }
-
-    .touch-label {
-      color: var(--text);
-      font-size: 17px;
-      font-weight: 700;
-      line-height: 1.8;
-    }
-
-    .touch-sublabel {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .current-prayer-badge {
-      position: absolute;
-      right: 50%;
-      bottom: 12px;
-      z-index: 2;
-      transform: translateX(50%);
-      padding: 3px 12px;
-      color: var(--accent);
-      background: rgba(17, 24, 39, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-
-    .flash {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      opacity: 0;
-      border-radius: var(--r-xl);
-      background: rgba(16, 185, 129, 0.25);
-      pointer-events: none;
-    }
-
-    .flash.go {
-      animation: flash-animation 250ms ease forwards;
-    }
-
-    @keyframes flash-animation {
-      0% {
-        opacity: 1;
-      }
-
-      100% {
-        opacity: 0;
-      }
-    }
-
-    /* ردیف پایین صفحه اصلی */
-
-    .bottom-row {
-      display: flex;
-      width: 100%;
-      height: 90px;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .counter-card {
-      flex: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 2px;
-      padding: 6px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-lg);
-    }
-
-    .counter-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .counter-value {
-      font-size: 40px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .counter-card.sajdeh .counter-value {
-      color: var(--accent2);
-    }
-
-    .counter-card.rakaat .counter-value {
-      color: var(--accent);
-    }
-
-    /*
-      دکمه‌ها:
-      ریست در بالا
-      خروج در پایین
-    */
-
-    .center-controls {
-      flex: 1.4;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .reset-btn-inline,
-    .exit-btn {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      cursor: pointer;
-      touch-action: none;
-    }
-
-    .reset-btn-inline {
-      flex: 1.3;
-      flex-direction: column;
-      background: var(--danger-bg);
-      border: 1.5px solid #7f1d1d;
-      border-radius: var(--r-lg);
-      color: var(--danger);
-      font-size: 11px;
-      font-weight: 700;
+    .reset-btn {
+      background: #f59e0b;
     }
 
     .exit-btn {
-      flex: 1;
-      min-height: 40px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-lg);
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
+      background: #ef4444;
     }
 
-    .reset-btn-inline:active,
-    .exit-btn:active {
-      background: var(--touch-act);
-    }
-
-    .reset-btn-inline:active {
-      color: var(--danger);
-    }
-
-    .exit-btn:active {
-      color: var(--text);
-    }
-
-    .reset-progress,
-    .exit-progress {
+    /* مودال انتخاب نماز */
+    .modal-overlay {
       position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 0%;
-      height: 4px;
-      pointer-events: none;
-    }
-
-    .reset-progress {
-      background: var(--danger);
-    }
-
-    .exit-progress {
-      background: var(--muted);
-    }
-
-    /* پیام‌های کوتاه */
-
-    .toast {
-      position: fixed;
-      right: 50%;
-      bottom: 20px;
-      z-index: 100000;
-      max-width: min(90%, 420px);
-      padding: 10px 16px;
-      transform: translateX(50%) translateY(20px);
-      opacity: 0;
-      color: var(--text);
-      background: #374151;
-      border: 1px solid #4b5563;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.7;
-      text-align: center;
-      pointer-events: none;
-      transition:
-        opacity 0.25s ease,
-        transform 0.25s ease;
-    }
-
-    .toast.show {
-      transform: translateX(50%) translateY(0);
-      opacity: 1;
-    }
-
-    /* صفحه انتخاب نماز و صفحه پایان */
-
-    .select-overlay,
-    .done-overlay {
-      position: fixed;
       inset: 0;
-      z-index: 9999;
-      display: none;
+      background: #0f172acc;
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      z-index: 50;
       padding: 16px;
-      background: rgba(10, 10, 15, 0.96);
+      gap: 12px;
     }
 
-    .select-overlay.show,
-    .done-overlay.show {
-      display: flex;
+    .modal-overlay.hidden {
+      display: none;
     }
 
-    /*
-      در صفحه انتخاب، کادر انتخاب و دکمه خروج
-      به صورت عمودی قرار می‌گیرند.
-    */
-
-    .select-overlay {
-      flex-direction: column;
-    }
-
-    .select-box {
-      width: min(500px, 100%);
+    .modal-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
       padding: 16px 20px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-xl);
+      max-width: 440px;
+      width: 100%;
       text-align: center;
     }
 
-    .select-title {
-      margin-bottom: 4px;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .select-description {
+    .modal-card h2 {
+      font-size: 1.15rem;
       margin-bottom: 12px;
-      color: var(--muted);
-      font-size: 12px;
+      color: #38bdf8;
     }
 
-    .prayer-options {
+    .prayer-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
     .prayer-btn {
-      min-height: 48px;
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      padding: 10px 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
       display: flex;
-      align-items: center;
-      justify-content: center;
       flex-direction: column;
-      gap: 2px;
-      background: var(--touch-bg);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .prayer-btn:active {
-      background: var(--touch-act);
-    }
-
-    .custom-section {
-      grid-column: 1 / -1;
-      display: flex;
+      gap: 4px;
       align-items: center;
-      gap: 8px;
-      margin-top: 6px;
-      padding: 6px 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      font-family: inherit;
     }
 
-    .stepper-label {
-      color: var(--muted);
-      font-size: 12px;
+    .prayer-btn:hover {
+      background: #475569;
     }
 
-    .stepper-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .prayer-btn .detail {
+      font-size: 0.7rem;
+      color: #94a3b8;
     }
 
-    .step-btn {
-      width: 36px;
-      height: 36px;
-      background: var(--touch-bg);
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-      touch-action: manipulation;
+    /* دکمه خروج بیرون کادر انتخاب */
+    .exit-btn-modal {
+      width: 100%;
+      max-width: 440px;
     }
 
-    .stepper-value {
-      min-width: 30px;
-      color: var(--accent);
-      font-size: 18px;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .custom-submit-btn {
-      flex: 1;
-      height: 36px;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      color: var(--accent-dark);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    /*
-      این دکمه خارج از select-box و زیر آن قرار دارد.
-    */
-
-    .select-overlay > .overlay-exit-btn {
-      flex: none;
-      width: min(220px, 80%);
-      height: 48px;
-      min-height: 48px;
-      margin-top: 14px;
-    }
-
-    .done-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      text-align: center;
-    }
-
-    .done-text {
-      color: var(--accent);
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1.8;
-    }
-
-    .done-reset {
-      padding: 12px 32px;
-      background: var(--accent);
-      border: none;
-      border-radius: 999px;
-      color: var(--accent-dark);
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    /*
-      دکمه خروج در صفحه پایان،
-      مستقیم زیر دکمه نماز جدید قرار دارد.
-    */
-
-    .done-box .overlay-exit-btn {
-      flex: none;
-      width: min(220px, 80vw);
-      height: 48px;
-      min-height: 48px;
-    }
-
-    /* پیام چرخاندن گوشی */
-
-    .orient-hint {
-      position: fixed;
+    /* پایان نماز */
+    .done-overlay {
+      position: absolute;
       inset: 0;
-      z-index: 99999;
-      display: none;
+      background: #0f172ae6;
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px;
-      background: rgba(10, 10, 15, 0.98);
-      color: var(--text);
-      font-size: 18px;
+      z-index: 60;
+      padding: 16px;
+    }
+
+    .done-overlay.hidden {
+      display: none;
+    }
+
+    .done-card {
+      background: #1e293b;
+      border: 2px solid #22c55e;
+      border-radius: 16px;
+      padding: 24px;
       text-align: center;
+      max-width: 380px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    @media (orientation: portrait) {
-      .orient-hint {
-        display: flex;
-      }
+    .done-card h2 {
+      color: #22c55e;
+      font-size: 1.3rem;
     }
 
-    @media (max-width: 560px) {
-      .app-container {
-        padding: 8px;
-      }
+    .done-card p {
+      color: #cbd5e1;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
 
-      .bottom-row {
-        height: 82px;
-        gap: 6px;
-      }
+    .btn-new-prayer {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
 
-      .counter-value {
-        font-size: 32px;
-      }
+    .btn-new-prayer:hover {
+      background: #0369a1;
+    }
 
-      .touch-label {
-        font-size: 15px;
-      }
+    /* کادر اعلان کوتاه (Toast) */
+    .toast-msg {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #334155;
+      color: #f8fafc;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 100;
+      border: 1px solid #64748b;
+    }
 
-      .touch-sublabel {
-        font-size: 10px;
-      }
-
-      .current-prayer-badge {
-        bottom: 8px;
-        font-size: 11px;
-      }
-
-      .select-box {
-        padding: 12px;
-      }
-
-      .prayer-options {
-        gap: 6px;
-      }
-
-      .prayer-btn {
-        min-height: 42px;
-        font-size: 12px;
-      }
-
-      .done-text {
-        font-size: 20px;
-      }
+    .toast-msg.show {
+      opacity: 1;
     }
   </style>
 </head>
-
 <body>
 
+  <!-- پیام راهنما برای چرخش گوشی به همراه ایموجی موبایل -->
   <div class="orient-hint">
-    لطفاً برای استفاده، گوشی را به حالت افقی نگه دارید
+    📱 لطفاً برای استفاده، گوشی را به حالت افقی نگه دارید
   </div>
 
-  <div class="app-container">
+  <!-- نوار بالای صفحه -->
+  <header class="top-bar">
+    <div class="title">رکعت شمار پرهام</div>
+    <div class="prayer-name" id="currentPrayerLabel">نماز مغرب (۳ رکعت)</div>
+    <button class="btn-change" id="changePrayerBtn">تغییر نماز</button>
+  </header>
 
-    <!-- محل لمس و شمارش -->
-
-    <div class="touch-wrap">
-      <div
-        class="touch-zone"
-        id="touchZone"
-        role="button"
-        tabindex="0"
-        aria-label="محل حساس به لمس برای شمارش"
-      >
-        <div
-          class="cooldown-bg-fill"
-          id="cooldownBgFill"
-        ></div>
-
-        <div class="touch-content-wrapper">
-          <span
-            class="touch-label"
-            id="touchMainLabel"
-          >
-            محل حساس به لمس
-          </span>
-
-          <span
-            class="touch-sublabel"
-            id="touchSubLabel"
-          >
-            لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود
-          </span>
-        </div>
-
-        <span
-          id="currentPrayerLabel"
-          class="current-prayer-badge"
-        >
-          هنوز نمازی انتخاب نشده
-        </span>
+  <!-- بدنه اصلی -->
+  <main class="app-main">
+    <div class="counter-screen">
+      <!-- محل لمس بزرگ برای سجده -->
+      <div class="touch-zone" id="touchZone" role="button" tabindex="0">
+        <div class="icon">✋</div>
+        <div class="label">برای ثبت سجده لمس کنید</div>
+        <div class="sub-label">(یا پیشانی را روی این قسمت بگذارید)</div>
+        <div class="status-text" id="statusText">در انتظار شروع...</div>
       </div>
 
-      <div
-        class="flash"
-        id="flash"
-      ></div>
-    </div>
-
-    <!-- شمارنده‌ها و دکمه‌های کنترلی -->
-
-    <div class="bottom-row">
-
-      <div class="counter-card sajdeh">
-        <span class="counter-label">سجده</span>
-        <span
-          class="counter-value"
-          id="sajdeh-val"
-        >
-          0
-        </span>
-      </div>
-
-      <div class="center-controls">
-
-        <!-- دکمه ریست در بالا -->
-
-        <button
-          type="button"
-          class="reset-btn-inline"
-          id="resetBtn"
-          aria-label="ریست شمارنده با نگه داشتن یک و نیم ثانیه"
-        >
-          <span>ریست شمارنده</span>
-
-          <span style="font-size: 9px; opacity: 0.8;">
-            نگه داشتن ۱.۵ ثانیه
-          </span>
-
-          <div
-            class="reset-progress"
-            id="resetProgress"
-          ></div>
-        </button>
-
-        <!-- دکمه خروج در پایین -->
-
-        <button
-          type="button"
-          class="exit-btn"
-          id="exitMainBtn"
-          aria-label="خروج با نگه داشتن یک ثانیه"
-        >
-          <span>✕ خروج</span>
-
-          <div class="exit-progress"></div>
-        </button>
-
-      </div>
-
-      <div class="counter-card rakaat">
-        <span class="counter-label">رکعت</span>
-        <span
-          class="counter-value"
-          id="rakaat-val"
-        >
-          0
-        </span>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- صفحه انتخاب نوع نماز -->
-
-  <div
-    class="select-overlay show"
-    id="selectOverlay"
-  >
-    <div class="select-box">
-
-      <div class="select-title">
-        انتخاب نوع نماز
-      </div>
-
-      <div class="select-description">
-        یک نماز را انتخاب کنید:
-      </div>
-
-      <div class="prayer-options">
-
-        <button
-          type="button"
-          class="prayer-btn"
-          onclick="startPrayer('صبح', 2)"
-        >
-          صبح
-          <span>(۲ رکعت)</span>
-        </button>
-
-        <button
-          type="button"
-          class="prayer-btn"
-          onclick="startPrayer('ظهر', 4)"
-        >
-          ظهر
-          <span>(۴ رکعت)</span>
-        </button>
-
-        <button
-          type="button"
-          class="prayer-btn"
-          onclick="startPrayer('عصر', 4)"
-        >
-          عصر
-          <span>(۴ رکعت)</span>
-        </button>
-
-        <button
-          type="button"
-          class="prayer-btn"
-          onclick="startPrayer('مغرب', 3)"
-        >
-          مغرب
-          <span>(۳ رکعت)</span>
-        </button>
-
-        <button
-          type="button"
-          class="prayer-btn"
-          onclick="startPrayer('عشا', 4)"
-        >
-          عشا
-          <span>(۴ رکعت)</span>
-        </button>
-
-        <div class="custom-section">
-
-          <span class="stepper-label">
-            رکعت:
-          </span>
-
-          <div class="stepper-controls">
-
-            <button
-              type="button"
-              class="step-btn"
-              onclick="changeCustom(-1)"
-              aria-label="کاهش تعداد رکعت"
-            >
-              −
-            </button>
-
-            <span
-              class="stepper-value"
-              id="customRakaatDisplay"
-            >
-              1
-            </span>
-
-            <button
-              type="button"
-              class="step-btn"
-              onclick="changeCustom(1)"
-              aria-label="افزایش تعداد رکعت"
-            >
-              +
-            </button>
-
+      <!-- ستون کناری شمارنده‌ها و دکمه‌ها -->
+      <aside class="stats-sidebar">
+        <div class="stat-cards">
+          <!-- کارت رکعت -->
+          <div class="stat-card">
+            <span class="label">رکعت</span>
+            <span class="val" id="rakaatVal">۱ / ۳</span>
           </div>
 
-          <button
-            type="button"
-            class="custom-submit-btn"
-            onclick="startCustomPrayer()"
-          >
-            شروع مستحبی
-          </button>
-
+          <!-- کارت سجده -->
+          <div class="stat-card" id="sajdahCard">
+            <div>
+              <div class="label">سجده</div>
+              <div class="sajdah-dots" style="margin-top: 4px;">
+                <div class="sajdah-dot" id="dot1"></div>
+                <div class="sajdah-dot" id="dot2"></div>
+              </div>
+            </div>
+            <span class="val" id="sajdahVal">۰</span>
+          </div>
         </div>
 
+        <!-- دکمه‌های کنترل: ریست بالا، خروج پایین -->
+        <div class="control-actions">
+          <!-- دکمه ریست (نگه داشتن ۱.۵ ثانیه) -->
+          <button class="action-hold-btn reset-btn" id="resetCounterBtn">
+            <div class="progress-bar" id="resetProgress"></div>
+            <span>ریست شمارنده</span>
+          </button>
+
+          <!-- دکمه خروج (نگه داشتن ۱ ثانیه) -->
+          <button class="action-hold-btn exit-btn" id="exitAppBtn">
+            <div class="progress-bar" id="exitProgress"></div>
+            <span>خروج از برنامه</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- مودال انتخاب نماز -->
+    <div class="modal-overlay hidden" id="prayerModal">
+      <div class="modal-card">
+        <h2>انتخاب نوع نماز</h2>
+        <div class="prayer-grid">
+          <button class="prayer-btn" data-name="صبح" data-rakaat="2">
+            <span>صبح</span>
+            <span class="detail">۲ رکعت</span>
+          </button>
+          <button class="prayer-btn" data-name="ظهر" data-rakaat="4">
+            <span>ظهر</span>
+            <span class="detail">۴ رکعت</span>
+          </button>
+          <button class="prayer-btn" data-name="عصر" data-rakaat="4">
+            <span>عصر</span>
+            <span class="detail">۴ رکعت</span>
+          </button>
+          <button class="prayer-btn" data-name="مغرب" data-rakaat="3">
+            <span>مغرب</span>
+            <span class="detail">۳ رکعت</span>
+          </button>
+          <button class="prayer-btn" data-name="عشاء" data-rakaat="4">
+            <span>عشاء</span>
+            <span class="detail">۴ رکعت</span>
+          </button>
+          <button class="prayer-btn" data-name="مستحبی" data-rakaat="2">
+            <span>مستحبی</span>
+            <span class="detail">۲ رکعت</span>
+          </button>
+        </div>
       </div>
-
+      <!-- دکمه خروج بیرون کادر انتخاب نماز -->
+      <button class="action-hold-btn exit-btn exit-btn-modal" id="exitSelectBtn">
+        <div class="progress-bar" id="exitSelectProgress"></div>
+        <span>خروج از برنامه</span>
+      </button>
     </div>
 
-    <!-- خروج خارج از کادر انتخاب نماز و در پایین آن -->
-
-    <button
-      type="button"
-      class="exit-btn overlay-exit-btn"
-      id="exitSelectBtn"
-      aria-label="خروج با نگه داشتن یک ثانیه"
-    >
-      <span>✕ خروج</span>
-
-      <div class="exit-progress"></div>
-    </button>
-
-  </div>
-
-  <!-- صفحه پایان نماز -->
-
-  <div
-    class="done-overlay"
-    id="doneOverlay"
-  >
-    <div class="done-box">
-
-      <div
-        class="done-text"
-        id="doneText"
-      ></div>
-
-      <button
-        type="button"
-        class="done-reset"
-        onclick="resetAndChoosePrayer()"
-      >
-        نماز جدید
-      </button>
-
-      <!-- خروج زیر دکمه نماز جدید -->
-
-      <button
-        type="button"
-        class="exit-btn overlay-exit-btn"
-        id="exitDoneBtn"
-        aria-label="خروج با نگه داشتن یک ثانیه"
-      >
-        <span>✕ خروج</span>
-
-        <div class="exit-progress"></div>
-      </button>
-
+    <!-- کادر پایان نماز به همراه ایموجی ماه 🌙 -->
+    <div class="done-overlay hidden" id="doneOverlay">
+      <div class="done-card">
+        <h2>قبول باشد</h2>
+        <p id="doneText">نماز مغرب کامل شد 🌙<br>۳ رکعت تمام</p>
+        <button class="btn-new-prayer" id="newPrayerBtn">نماز جدید</button>
+        <!-- دکمه خروج زیر نماز جدید -->
+        <button class="action-hold-btn exit-btn" id="exitDoneBtn">
+          <div class="progress-bar" id="exitDoneProgress"></div>
+          <span>خروج از برنامه</span>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- پیام خروج یا پیام‌های کوتاه -->
-
-  <div
-    class="toast"
-    id="toast"
-    role="status"
-    aria-live="polite"
-  ></div>
+    <!-- اعلان پیام تاچ زودهنگام -->
+    <div class="toast-msg" id="toastMsg"></div>
+  </main>
 
   <script>
-    let sajdeh = 0;
-    let rakaat = 0;
-    let maxRakaat = 0;
-    let selectedPrayer = "";
-    let isActive = false;
-    let isFinished = false;
-    let lastCountedAt = 0;
-    let customRakaatCount = 1;
-
-    const DEBOUNCE_MS = 3000;
-    const RESET_HOLD_MS = 1500;
-    const EXIT_HOLD_MS = 1000;
-
-    let toastTimer = null;
-
-    function render() {
-      document.getElementById("sajdeh-val").textContent = sajdeh;
-      document.getElementById("rakaat-val").textContent = rakaat;
-    }
-
-    function showToast(message, duration = 3000) {
-      const toast = document.getElementById("toast");
-
-      toast.textContent = message;
-      toast.classList.add("show");
-
-      clearTimeout(toastTimer);
-
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, duration);
-    }
-
-    function changeCustom(delta) {
-      customRakaatCount = Math.max(
-        1,
-        Math.min(50, customRakaatCount + delta)
-      );
-
-      document.getElementById(
-        "customRakaatDisplay"
-      ).textContent = customRakaatCount;
-    }
-
-    function startCustomPrayer() {
-      startPrayer("مستحبی", customRakaatCount);
-    }
-
-    function startPrayer(name, rakaatCount) {
-      selectedPrayer = name;
-      maxRakaat = rakaatCount;
-      rakaat = 1;
-      sajdeh = 0;
-      isActive = true;
-      isFinished = false;
-      lastCountedAt = 0;
-
-      document.getElementById(
-        "currentPrayerLabel"
-      ).textContent = `نماز ${selectedPrayer} (${maxRakaat} رکعت)`;
-
-      document
-        .getElementById("selectOverlay")
-        .classList.remove("show");
-
-      document
-        .getElementById("doneOverlay")
-        .classList.remove("show");
-
-      render();
-    }
-
-    function handleTouchClick() {
-      if (!isActive || isFinished) {
-        return;
-      }
-
-      const now = Date.now();
-
-      if (now - lastCountedAt < DEBOUNCE_MS) {
-        showToast("این لمس هنوز در فاصلهٔ ۳ ثانیه‌ای قرار دارد.");
-        return;
-      }
-
-      lastCountedAt = now;
-
-      if (sajdeh === 0) {
-        sajdeh = 1;
-      } else if (sajdeh === 1) {
-        sajdeh = 2;
-      } else {
-        if (rakaat < maxRakaat) {
-          rakaat++;
-          sajdeh = 1;
-        } else {
-          rakaat = maxRakaat;
-          sajdeh = 2;
-          isFinished = true;
-
-          render();
-
-          document.getElementById(
-            "doneText"
-          ).innerHTML = `نماز ${selectedPrayer} کامل شد<br>${maxRakaat} رکعت تمام`;
-
-          document
-            .getElementById("doneOverlay")
-            .classList.add("show");
-
-          return;
-        }
-      }
-
-      animateTouchFeedback();
-      render();
-    }
-
-    function animateTouchFeedback() {
-      const flash = document.getElementById("flash");
-
-      flash.classList.remove("go");
-
-      void flash.offsetWidth;
-
-      flash.classList.add("go");
-
-      const cooldownFill = document.getElementById(
-        "cooldownBgFill"
-      );
-
-      const zone = document.getElementById("touchZone");
-      const startedAt = Date.now();
-
-      zone.classList.add("cooldown");
-
-      function animateCooldown() {
-        const elapsed = Date.now() - startedAt;
-
-        const percentage = Math.min(
-          (elapsed / DEBOUNCE_MS) * 100,
-          100
-        );
-
-        cooldownFill.style.width = `${percentage}%`;
-
-        if (elapsed < DEBOUNCE_MS) {
-          requestAnimationFrame(animateCooldown);
-        } else {
-          cooldownFill.style.width = "0%";
-          zone.classList.remove("cooldown");
-        }
-      }
-
-      requestAnimationFrame(animateCooldown);
-    }
-
-    function resetAndChoosePrayer() {
-      sajdeh = 0;
-      rakaat = 0;
-      maxRakaat = 0;
-      selectedPrayer = "";
-      isActive = false;
-      isFinished = false;
-      lastCountedAt = 0;
-
-      document.getElementById(
-        "currentPrayerLabel"
-      ).textContent = "هنوز نمازی انتخاب نشده";
-
-      document
-        .getElementById("doneOverlay")
-        .classList.remove("show");
-
-      document
-        .getElementById("selectOverlay")
-        .classList.add("show");
-
-      render();
-    }
-
-    /*
-      اجرای یک عملیات با نگه داشتن دکمه.
-      این تابع برای ریست و خروج استفاده می‌شود.
-    */
-
-    function setupHoldAction(
-      button,
-      progressElement,
-      holdDuration,
-      action
-    ) {
-      if (!button || !progressElement) {
-        return;
-      }
-
-      let animationFrame = null;
-      let startedAt = 0;
-      let actionExecuted = false;
-
-      function resetHold() {
-        if (animationFrame !== null) {
-          cancelAnimationFrame(animationFrame);
-          animationFrame = null;
-        }
-
-        if (!actionExecuted) {
-          progressElement.style.width = "0%";
-        }
-      }
-
-      function updateProgress() {
-        const elapsed = performance.now() - startedAt;
-
-        const percentage = Math.min(
-          (elapsed / holdDuration) * 100,
-          100
-        );
-
-        progressElement.style.width = `${percentage}%`;
-
-        if (elapsed >= holdDuration) {
-          actionExecuted = true;
-          progressElement.style.width = "100%";
-          animationFrame = null;
-          action();
-          return;
-        }
-
-        animationFrame = requestAnimationFrame(updateProgress);
-      }
-
-      function startHold(event) {
-        event.preventDefault();
-
-        if (
-          event.pointerId !== undefined &&
-          button.setPointerCapture
-        ) {
-          button.setPointerCapture(event.pointerId);
-        }
-
-        if (animationFrame !== null) {
-          cancelAnimationFrame(animationFrame);
-        }
-
-        actionExecuted = false;
-        startedAt = performance.now();
-        progressElement.style.width = "0%";
-
-        animationFrame = requestAnimationFrame(updateProgress);
-      }
-
-      function cancelHold(event) {
-        if (
-          event &&
-          event.pointerId !== undefined &&
-          button.hasPointerCapture &&
-          button.hasPointerCapture(event.pointerId)
-        ) {
-          button.releasePointerCapture(event.pointerId);
-        }
-
-        resetHold();
-      }
-
-      button.addEventListener("pointerdown", startHold);
-      button.addEventListener("pointerup", cancelHold);
-      button.addEventListener("pointercancel", cancelHold);
-      button.addEventListener("pointerleave", cancelHold);
-      button.addEventListener("lostpointercapture", resetHold);
-
-      button.addEventListener("contextmenu", (event) => {
-        event.preventDefault();
-      });
-    }
-
-    /*
-      ریست شمارنده با نگه داشتن ۱.۵ ثانیه
-    */
-
-    setupHoldAction(
-      document.getElementById("resetBtn"),
-      document.getElementById("resetProgress"),
-      RESET_HOLD_MS,
-      resetAndChoosePrayer
-    );
-
-    /*
-      خروج از برنامه با نگه داشتن ۱ ثانیه
-    */
-
-    function tryToExitApp() {
-      showToast("در حال تلاش برای خروج از برنامه...", 1800);
-
-      let closeAttempted = false;
-
-      try {
-        closeAttempted = true;
-        window.close();
-      } catch (error) {
-        closeAttempted = false;
-      }
-
+    // متغیرهای وضعیت
+    let selectedPrayer = 'مغرب';
+    let maxRakaat = 3;
+    let currentRakaat = 1;
+    let currentSajdah = 0;
+    let lastTapTime = 0;
+    const DEBOUNCE_TIME = 3000; // تاخیر ۳ ثانیه‌ای بین سجده‌ها
+
+    // ارجاع به المان‌های صفحه
+    const touchZone = document.getElementById('touchZone');
+    const rakaatVal = document.getElementById('rakaatVal');
+    const sajdahVal = document.getElementById('sajdahVal');
+    const dot1 = document.getElementById('dot1');
+    const dot2 = document.getElementById('dot2');
+    const sajdahCard = document.getElementById('sajdahCard');
+    const statusText = document.getElementById('statusText');
+    const currentPrayerLabel = document.getElementById('currentPrayerLabel');
+    const prayerModal = document.getElementById('prayerModal');
+    const changePrayerBtn = document.getElementById('changePrayerBtn');
+    const doneOverlay = document.getElementById('doneOverlay');
+    const doneText = document.getElementById('doneText');
+    const newPrayerBtn = document.getElementById('newPrayerBtn');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // تابع نمایش پیام Toast
+    function showToast(text) {
+      toastMsg.innerText = text;
+      toastMsg.classList.add('show');
       setTimeout(() => {
-        if (
-          document.visibilityState !== "hidden" ||
-          closeAttempted
-        ) {
-          showToast(
-            "مرورگر اجازهٔ بستن مستقیم برنامه را نمی‌دهد. برای خروج از دکمهٔ برگشت یا Home گوشی استفاده کنید.",
-            5000
-          );
-        }
-      }, 500);
+        toastMsg.classList.remove('show');
+      }, 1500);
     }
 
-    function setupExitButton(buttonId) {
-      const button = document.getElementById(buttonId);
+    // به‌روزرسانی رابط کاربری
+    function updateUI() {
+      currentPrayerLabel.innerText = `نماز ${selectedPrayer} (${maxRakaat} رکعت)`;
+      rakaatVal.innerText = `${currentRakaat} / ${maxRakaat}`;
+      sajdahVal.innerText = currentSajdah;
 
-      if (!button) {
+      dot1.classList.toggle('filled', currentSajdah >= 1);
+      dot2.classList.toggle('filled', currentSajdah >= 2);
+
+      if (currentSajdah > 0) {
+        sajdahCard.classList.add('active-sajdah');
+      } else {
+        sajdahCard.classList.remove('active-sajdah');
+      }
+
+      if (currentSajdah === 0) {
+        statusText.innerText = `رکعت ${currentRakaat} - سجده اول را بجا آورید`;
+      } else if (currentSajdah === 1) {
+        statusText.innerText = `رکعت ${currentRakaat} - سجده دوم را بجا آورید`;
+      }
+    }
+
+    // منطق ثبت لمس سجده
+    function registerSajdah() {
+      const now = Date.now();
+      if (now - lastTapTime < DEBOUNCE_TIME) {
+        showToast('فاصله بین دو سجده حداقل ۳ ثانیه است');
         return;
       }
+      lastTapTime = now;
 
-      const progressElement = button.querySelector(
-        ".exit-progress"
-      );
+      currentSajdah++;
 
-      setupHoldAction(
-        button,
-        progressElement,
-        EXIT_HOLD_MS,
-        tryToExitApp
-      );
+      if (currentSajdah === 2) {
+        updateUI();
+        if (currentRakaat === maxRakaat) {
+          // پایان نماز همراه با ایموجی ماه 🌙
+          setTimeout(() => {
+            doneText.innerHTML = `نماز ${selectedPrayer} کامل شد 🌙<br>${maxRakaat} رکعت تمام`;
+            doneOverlay.classList.remove('hidden');
+          }, 400);
+        } else {
+          // رفتن به رکعت بعدی
+          setTimeout(() => {
+            currentRakaat++;
+            currentSajdah = 0;
+            updateUI();
+          }, 400);
+        }
+      } else {
+        updateUI();
+      }
     }
 
-    setupExitButton("exitMainBtn");
-    setupExitButton("exitSelectBtn");
-    setupExitButton("exitDoneBtn");
-
-    /*
-      لمس محل شمارش
-    */
-
-    const touchZone = document.getElementById("touchZone");
-
-    touchZone.addEventListener("pointerup", (event) => {
-      event.preventDefault();
-      handleTouchClick();
+    // لیسنرهای لمس منطقه سجده
+    touchZone.addEventListener('pointerup', (e) => {
+      e.preventDefault();
+      registerSajdah();
     });
 
-    touchZone.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-    });
-
-    /*
-      پشتیبانی از صفحه‌کلید برای دسترسی بهتر
-    */
-
-    touchZone.addEventListener("keydown", (event) => {
-      if (
-        event.key === "Enter" ||
-        event.key === " "
-      ) {
-        event.preventDefault();
-        handleTouchClick();
+    touchZone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        registerSajdah();
       }
     });
 
-    render();
-  </script>
+    // منطق نگه داشتن دکمه (Hold to Trigger)
+    function setupHoldButton(btnId, progressId, duration, onComplete) {
+      const btn = document.getElementById(btnId);
+      const prog = document.getElementById(progressId);
+      let timer = null;
+      let startTime = 0;
 
+      function start(e) {
+        e.preventDefault();
+        startTime = Date.now();
+        prog.style.width = '0%';
+        timer = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const percent = Math.min((elapsed / duration) * 100, 100);
+          prog.style.width = percent + '%';
+          if (elapsed >= duration) {
+            cancel();
+            onComplete();
+          }
+        }, 30);
+      }
+
+      function cancel() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        prog.style.width = '0%';
+      }
+
+      btn.addEventListener('pointerdown', start);
+      btn.addEventListener('pointerup', cancel);
+      btn.addEventListener('pointerleave', cancel);
+      btn.addEventListener('pointercancel', cancel);
+    }
+
+    // ریست کردن وضعیت نماز
+    function resetPrayerState() {
+      currentRakaat = 1;
+      currentSajdah = 0;
+      updateUI();
+    }
+
+    // تابع بستن برنامه
+    function closeApplication() {
+      window.close();
+      setTimeout(() => {
+        showToast('برای بستن کامل، از دکمه هوم یا بستن پنجره استفاده کنید');
+      }, 300);
+    }
+
+    // راه‌اندازی دکمه ریست شمارنده (۱.۵ ثانیه)
+    setupHoldButton('resetCounterBtn', 'resetProgress', 1500, () => {
+      resetPrayerState();
+      showToast('شمارنده بازنشانی شد');
+    });
+
+    // راه‌اندازی دکمه‌های خروج (۱ ثانیه)
+    setupHoldButton('exitAppBtn', 'exitProgress', 1000, closeApplication);
+    setupHoldButton('exitSelectBtn', 'exitSelectProgress', 1000, closeApplication);
+    setupHoldButton('exitDoneBtn', 'exitDoneProgress', 1000, closeApplication);
+
+    // مدیریت مودال انتخاب نماز
+    changePrayerBtn.addEventListener('click', () => {
+      prayerModal.classList.remove('hidden');
+    });
+
+    document.querySelectorAll('.prayer-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget;
+        selectedPrayer = target.dataset.name;
+        maxRakaat = parseInt(target.dataset.rakaat, 10);
+        resetPrayerState();
+        prayerModal.classList.add('hidden');
+      });
+    });
+
+    // دکمه شروع نماز جدید
+    newPrayerBtn.addEventListener('click', () => {
+      doneOverlay.classList.add('hidden');
+      prayerModal.classList.remove('hidden');
+    });
+
+    // مقداردهی اولیه
+    updateUI();
+  </script>
 </body>
 </html>

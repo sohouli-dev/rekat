@@ -1,4 +1,4 @@
-const CACHE_NAME = "rakaat-counter-v6";
+const CACHE_NAME = "rakaat-counter-v7";
 const CACHE_PREFIX = "rakaat-counter-";
 
 // فقط فایل‌هایی که واقعاً دارید:
@@ -41,6 +41,10 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  // اگر درخواست مربوط به assetlinks بود، مستقیماً از اینترنت بخوان و کش نکن
+     if (event.request.url.includes('.well-known/')) {
+       return;
+     }
   const request = event.request;
 
   if (request.method !== "GET") {

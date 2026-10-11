@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.sohouli_dev.twa",
+        "sha256_cert_fingerprints": ["91:72:80:76:26:79:04:13:5A:4F:36:94:39:94:CF:0F:39:7D:42:43:32:21:1F:F8:A3:D6:6E:4A:CB:B9:6F:91"]
+      }
+    }]

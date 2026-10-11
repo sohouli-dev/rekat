@@ -1,10 +1,11 @@
-const CACHE_NAME = "rakaat-counter-v5";
+const CACHE_NAME = "rakaat-counter-v6";
 const CACHE_PREFIX = "rakaat-counter-";
 
 // فقط فایل‌هایی که واقعاً دارید:
 const STATIC_ASSETS = [
   "./",
   "./index.html",
+  "./manifest.json",
   "./icon-512.png",
   "./duas.json"
 ];

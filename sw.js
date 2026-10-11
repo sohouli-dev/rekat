@@ -1,63 +1,145 @@
-const CACHE_NAME = 'rakaat-counter-v2';
+const CACHE_NAME = "rakaat-counter-v5";
+const CACHE_PREFIX = "rakaat-counter-";
 
-// فایل‌های اصلی که باید برای اجرای آفلاین ذخیره شوند
+// فقط فایل‌هایی که واقعاً دارید:
 const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-512.png'
+  "./",
+  "./index.html",
+  "./icon-512.png",
+  "./duas.json"
 ];
 
-// مرحله نصب: فایل‌های ضروری پوسته برنامه کش می‌شوند
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.addAll(STATIC_ASSETS);
+      await self.skipWaiting();
+    })()
   );
-  self.skipWaiting();
 });
 
-// پاکسازی کش‌های قدیمی در صورت تغییر نسخه
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
-        })
+    (async () => {
+      const keys = await caches.keys();
+
+      await Promise.all(
+        keys
+          .filter(
+            (key) =>
+              key.startsWith(CACHE_PREFIX) &&
+              key !== CACHE_NAME
+          )
+          .map((key) => caches.delete(key))
       );
-    })
+
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
 
-// مدیریت درخواست‌ها
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
 
-  // استراتژی برای duas.json: اول اینترنت، اگر قطع بود استفاده از کش
-  if (url.pathname.endsWith('duas.json')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          // اگر اینترنت وصل بود و نسخه جدید دریافت شد، در کش هم ذخیره شود
-          if (networkResponse && networkResponse.status === 200) {
-            const resClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          // اگر اینترنت قطع بود، از کش لود کن
-          return caches.match(event.request);
-        })
-    );
+  if (request.method !== "GET") {
     return;
   }
 
-  // بقیه فایل‌ها (کد اصلی، آیکون و...): اول کش، سپس شبکه (Offline-First)
+  const url = new URL(request.url);
+
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // مدیریت فایل دعاها
+  if (url.pathname.endsWith("/duas.json")) {
+    const isUpdateCheck = url.searchParams.has("check");
+
+    const cacheUrl = new URL(request.url);
+    cacheUrl.search = "";
+    cacheUrl.hash = "";
+
+    const cacheKey = new Request(cacheUrl.href, {
+      method: "GET"
+    });
+
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+
+        try {
+          const response = await fetch(request);
+
+          if (response.ok) {
+            await cache.put(cacheKey, response.clone());
+          }
+
+          return response;
+        } catch (error) {
+          if (isUpdateCheck) {
+            throw error;
+          }
+
+          const cachedResponse = await cache.match(cacheKey);
+
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+
+          return new Response("Offline", {
+            status: 503,
+            statusText: "Offline"
+          });
+        }
+      })()
+    );
+
+    return;
+  }
+
+  // فایل‌های ناوبری صفحه
+  if (request.mode === "navigate") {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+
+        const cachedPage = await cache.match(request, {
+          ignoreSearch: true
+        });
+
+        if (cachedPage) {
+          return cachedPage;
+        }
+
+        const indexUrl = new URL(
+          "./index.html",
+          self.registration.scope
+        ).href;
+
+        const cachedIndex = await cache.match(indexUrl);
+
+        if (cachedIndex) {
+          return cachedIndex;
+        }
+
+        return fetch(request);
+      })()
+    );
+
+    return;
+  }
+
+  // سایر فایل‌های برنامه (مثل همین icon-512.png)
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
-    })
+    (async () => {
+      const cachedResponse = await caches.match(request);
+
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(request);
+    })()
   );
 });

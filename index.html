@@ -56,10 +56,11 @@
       background: var(--bg);
       color: var(--text);
       font-family:
-        "Segoe UI",
-        Tahoma,
+        "Vazirmatn",
+        "Vazir",
         system-ui,
         -apple-system,
+        "Segoe UI",
         sans-serif;
       overflow: hidden;
       user-select: none;
@@ -243,8 +244,8 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 2px;
-      padding: 6px;
+      gap: 1px;
+      padding: 2px 4px;
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--r-lg);
@@ -252,14 +253,15 @@
 
     .counter-label {
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 700;
     }
 
     .counter-value {
-      font-size: 40px;
-      font-weight: 800;
-      line-height: 1;
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 0.95;
+      font-variant-numeric: tabular-nums;
     }
 
     .counter-card.sajdeh .counter-value {
@@ -650,8 +652,12 @@
         gap: 6px;
       }
 
+      .counter-label {
+        font-size: 14px;
+      }
+
       .counter-value {
-        font-size: 32px;
+        font-size: 48px;
       }
 
       .touch-label {

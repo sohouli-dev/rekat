@@ -205,6 +205,28 @@
       }
     }
 
+    /* افکت انیمیشن موجی لمس (Ripple Effect) */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, rgba(16, 185, 129, 0.25) 50%, rgba(16, 185, 129, 0) 100%);
+      transform: scale(0);
+      animation: ripple-animation 600ms cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @keyframes ripple-animation {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(3.5);
+        opacity: 0;
+      }
+    }
+
     /* ردیف پایین صفحه اصلی */
 
     .bottom-row {
@@ -1005,6 +1027,25 @@
 
     let pendingRemoteData = null;
 
+    /* قابلیت روشن ماندن دائم صفحه (Screen Wake Lock) */
+    let wakeLockSentinel = null;
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {}
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (wakeLockSentinel !== null && document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    });
+
+    requestWakeLock();
+
     function getLocalDuasData() {
       try {
         const stored = localStorage.getItem("parham_duas_data");
@@ -1170,7 +1211,44 @@
       render();
     }
 
-    function handleTouchClick() {
+    /* ایجاد انیمیشن موجی لمس (Ripple Effect) */
+    function createTouchRipple(e) {
+      const zone = document.getElementById("touchZone");
+      if (!zone) return;
+
+      const rect = zone.getBoundingClientRect();
+      const ripple = document.createElement("span");
+      ripple.className = "touch-ripple";
+
+      let clientX, clientY;
+      if (e && e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else if (e && e.clientX !== undefined) {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      } else {
+        clientX = rect.left + rect.width / 2;
+        clientY = rect.top + rect.height / 2;
+      }
+
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      const size = Math.max(rect.width, rect.height) * 0.45;
+
+      ripple.style.width = size + "px";
+      ripple.style.height = size + "px";
+      ripple.style.left = (x - size / 2) + "px";
+      ripple.style.top = (y - size / 2) + "px";
+
+      zone.appendChild(ripple);
+
+      setTimeout(() => {
+        ripple.remove();
+      }, 650);
+    }
+
+    function handleTouchClick(e) {
       if (!isActive || isFinished) {
         return;
       }
@@ -1211,6 +1289,7 @@
         }
       }
 
+      createTouchRipple(e);
       animateTouchFeedback();
       render();
     }
@@ -1444,7 +1523,7 @@
 
     touchZone.addEventListener("pointerup", (event) => {
       event.preventDefault();
-      handleTouchClick();
+      handleTouchClick(event);
     });
 
     touchZone.addEventListener("contextmenu", (event) => {
@@ -1461,7 +1540,7 @@
         event.key === " "
       ) {
         event.preventDefault();
-        handleTouchClick();
+        handleTouchClick(event);
       }
     });
 

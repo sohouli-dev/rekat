@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ّ<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -175,6 +175,18 @@
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     }
 
+    .touch-prayer-info {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      z-index: 3;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+    }
+
     .touch-sublabel {
       margin-top: 2px;
       color: var(--muted);
@@ -239,7 +251,7 @@
     }
 
     .counter-card {
-      flex: 2;
+      flex: 1.33;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -270,6 +282,39 @@
 
     .counter-card.rakaat .counter-value {
       color: var(--accent);
+    }
+
+    .counter-card.action-card {
+      flex: 2;
+      order: 3;
+    }
+
+    .counter-card.action-card {
+      flex-direction: row;
+      gap: 10px;
+    }
+
+    .action-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .counter-card.sajdeh {
+      order: 1;
+    }
+
+    .counter-card.rakaat {
+      order: 2;
+    }
+
+    .center-controls {
+      order: 4;
     }
 
     /*
@@ -732,6 +777,11 @@
             لمس با فاصله کمتر از ۳ ثانیه شمرده نمی‌شود
           </span>
         </div>
+
+        <span
+          class="touch-prayer-info"
+          id="touchPrayerInfo"
+        ></span>
       </div>
 
       <div
@@ -799,6 +849,11 @@
         >
           0
         </span>
+      </div>
+
+      <div class="counter-card action-card">
+        <span class="counter-label">اقدام بعدی</span>
+        <span class="action-text" id="nextActionText"></span>
       </div>
 
     </div>
@@ -1018,6 +1073,15 @@
     const RESET_HOLD_MS = 1500;
     const EXIT_HOLD_MS = 1000;
 
+    // متن «اقدام بعدی» بر اساس تعداد رکعت نماز و رکعت تمام‌شده (هر سطر یک خط)
+    const ACTION_TEXTS = {
+      2: { 1: ["قنوت","تشهد", "سلام"] },
+      3: { 1: ["قنوت", "تشهد"], 2: ["تشهد", "سلام"] },
+      4: { 1: ["قنوت", "تشهد"], 2: ["تسبیحات اربعه"], 3: ["تشهد", "سلام"] }
+    };
+
+    let nextActionLines = [];
+
     let toastTimer = null;
 
     /* پایگاه دعاهای پیش‌فرض و آفلاین */
@@ -1169,6 +1233,25 @@
     function render() {
       document.getElementById("sajdeh-val").textContent = sajdeh;
       document.getElementById("rakaat-val").textContent = rakaat;
+
+      // اقدام بعدی: بعد از هر سجدهٔ دوم عوض می‌شود
+      if (!isActive) {
+        nextActionLines = [];
+      } else if (sajdeh === 2) {
+        const table = ACTION_TEXTS[maxRakaat];
+        if (table && table[rakaat]) {
+          nextActionLines = table[rakaat];
+        }
+      }
+      document.getElementById("nextActionText").innerHTML =
+        nextActionLines.map((t) => `<span>${t}</span>`).join("");
+
+      document.getElementById("touchPrayerInfo").textContent =
+        isActive ? `نماز ${selectedPrayer} - ${maxRakaat} رکعت` : "";
+
+      // متن دعا بعد از سجدهٔ دوم رکعت دوم پنهان می‌شود
+      const hideDua = isActive && (rakaat > 2 || (rakaat === 2 && sajdeh === 2));
+      document.getElementById("duaContainer").style.display = hideDua ? "none" : "";
     }
 
     function showToast(message, duration = 3000) {

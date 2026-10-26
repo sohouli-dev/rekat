@@ -106,7 +106,7 @@
       cursor: pointer;
       touch-action: manipulation;
     }
-    /* اضافه شدن تصویر bAcm.png به عنوان پس‌زمینه کمرنگ زیر همه چیز در ناحیه لمس */
+    /* اضافه شدن تصویر bAcm.png به عنوان پس‌زمینه کمرنگ زیر همه چیز در ناحیه لمس 
     .touch-zone::before {
       content: "";
       position: absolute;
@@ -119,7 +119,7 @@
       pointer-events: none;
       z-index: 0;
       border-radius: calc(var(--r-xl) - 2px);
-    }
+    }*/
 
     .touch-zone.cooldown {
       background: var(--touch-wait);
@@ -517,6 +517,73 @@
       padding: 16px;
       background: rgba(10, 10, 15, 0.98);
       text-align: center;
+      overflow-y: auto;
+    }
+
+    .tasbih-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tasbih-row .tasbih-input {
+      flex: 1;
+      min-width: 0;
+      width: auto;
+    }
+
+    .tasbih-step {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      background: var(--touch-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .tasbih-presets {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tasbih-multi {
+      width: 100%;
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .tasbih-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tasbih-input.active {
+      border-color: var(--accent);
+    }
+
+    .tasbih-chip {
+      padding: 6px 12px;
+      background: var(--touch-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
     }
 
     .tasbih-overlay.show {
@@ -1824,6 +1891,76 @@
       let targets = [];
       let phase = 0;
       const inputs = [input, document.getElementById("tasbihTarget2"), document.getElementById("tasbihTarget3")];
+
+      // ساخت ردیف برای هر ورودی: دکمه‌های + و −، میانبرهای عددی و ورودی با کیبورد
+      function makeRow(inp) {
+        const wrap = document.createElement("div");
+        wrap.className = "tasbih-row";
+        const mk = (txt, cls, fn) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = cls;
+          b.textContent = txt;
+          b.addEventListener("click", fn);
+          return b;
+        };
+        const get = () => {
+          const n = parseInt(inp.value, 10);
+          return isNaN(n) ? 0 : n;
+        };
+        const set = (n) => { inp.value = n > 0 ? String(n) : ""; };
+
+        wrap.appendChild(mk("\u2212", "tasbih-step", () => set(Math.max(0, get() - 1))));
+        inp.parentNode.insertBefore(wrap, inp);
+        wrap.appendChild(inp);
+        wrap.appendChild(mk("+", "tasbih-step", () => set(get() + 1)));
+
+        // کیبورد فقط با سه بار لمس سریع روی ورودی باز می‌شود
+        inp.readOnly = true;
+        let taps = [];
+        inp.addEventListener("click", () => {
+          active = inp;
+          inputs.forEach((x) => x.classList.toggle("active", x === inp));
+        });
+        inp.addEventListener("click", () => {
+          const now = Date.now();
+          taps = taps.filter((t) => now - t < 800);
+          taps.push(now);
+          if (taps.length >= 3) {
+            taps = [];
+            inp.readOnly = false;
+            inp.focus();
+            setTimeout(() => inp.scrollIntoView({ block: "center" }), 300);
+          }
+        });
+        inp.addEventListener("blur", () => { inp.readOnly = true; });
+      }
+
+      inputs.forEach(makeRow);
+
+      // ستون عددهای آماده کنار همهٔ کادرها
+      let active = null;
+      const multi = document.createElement("div");
+      multi.className = "tasbih-multi";
+      const col = document.createElement("div");
+      col.className = "tasbih-col";
+      const presetCol = document.createElement("div");
+      presetCol.className = "tasbih-presets";
+      inputs[0].parentNode.parentNode.insertBefore(multi, inputs[0].parentNode);
+      multi.appendChild(col);
+      multi.appendChild(presetCol);
+      inputs.forEach((i) => col.appendChild(i.parentNode));
+      [33, 100, 400, 1000].forEach((v) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "tasbih-chip";
+        b.textContent = String(v);
+        b.addEventListener("click", () => {
+          if (!active) return;
+          active.value = String(v);
+        });
+        presetCol.appendChild(b);
+      });
       let count = 0;
       let audioCtx = null;
 
@@ -1850,7 +1987,6 @@
         setup.style.display = "";
         counter.style.display = "none";
         inputs.forEach((i) => { i.value = ""; });
-        setTimeout(() => input.focus(), 50);
       }
 
       document.querySelectorAll(".tasbih-open").forEach((b) => b.addEventListener("click", () => {

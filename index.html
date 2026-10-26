@@ -106,6 +106,20 @@
       cursor: pointer;
       touch-action: manipulation;
     }
+    /* اضافه شدن تصویر bAcm.png به عنوان پس‌زمینه کمرنگ زیر همه چیز در ناحیه لمس */
+    .touch-zone::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url('bcm.jpg');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: calc(var(--r-xl) - 2px);
+    }
 
     .touch-zone.cooldown {
       background: var(--touch-wait);

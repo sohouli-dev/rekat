@@ -469,6 +469,144 @@
       text-align: center;
     }
 
+    .select-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: min(560px, 100%);
+    }
+
+    .select-row .select-box {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tasbih-tab {
+      flex: none;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      writing-mode: vertical-rl;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .tasbih-tab:active {
+      background: var(--touch-act);
+    }
+
+    .tasbih-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      background: rgba(10, 10, 15, 0.98);
+      text-align: center;
+    }
+
+    .tasbih-overlay.show {
+      display: flex;
+    }
+
+    .tasbih-setup,
+    .tasbih-counter {
+      width: min(500px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .tasbih-counter {
+      flex: 1;
+    }
+
+    .tasbih-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .tasbih-input {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .tasbih-btn {
+      width: 100%;
+      min-height: 44px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: var(--accent-dark);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .tasbih-btn.secondary {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+
+    .tasbih-zone {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-xl);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+
+    .tasbih-zone:active {
+      background: var(--touch-act);
+    }
+
+    .tasbih-count {
+      color: var(--accent);
+      font-size: 96px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .tasbih-target {
+      color: var(--muted);
+      font-size: 16px;
+    }
+
     .select-title {
       margin-bottom: 4px;
       font-size: 18px;
@@ -880,6 +1018,8 @@
     class="select-overlay show"
     id="selectOverlay"
   >
+    <div class="select-row">
+    <button type="button" class="tasbih-tab tasbih-open" id="tasbihOpenBtn">تسبیح دیجیتال</button>
     <div class="select-box">
 
       <div class="select-title">
@@ -985,6 +1125,7 @@
       </div>
 
     </div>
+    </div>
 
     <!-- خروج خارج از کادر انتخاب نماز و در پایین آن (تم قرمز) -->
 
@@ -1021,6 +1162,8 @@
       >
         نماز جدید
       </button>
+
+      <button type="button" class="done-reset tasbih-open" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text)">تسبیح دیجیتال</button>
 
       <!-- خروج زیر دکمه نماز جدید (تم قرمز) -->
 
@@ -1061,6 +1204,25 @@
           خیر
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- تسبیح دیجیتال -->
+  <div class="tasbih-overlay" id="tasbihOverlay">
+    <div class="tasbih-setup" id="tasbihSetup">
+      <div class="tasbih-title">تعداد را مشخص کنید</div>
+      <input type="number" inputmode="numeric" min="1" class="tasbih-input" id="tasbihTarget" placeholder="عدد اول">
+      <input type="number" inputmode="numeric" min="1" class="tasbih-input" id="tasbihTarget2" placeholder="عدد دوم (اختیاری)">
+      <input type="number" inputmode="numeric" min="1" class="tasbih-input" id="tasbihTarget3" placeholder="عدد سوم (اختیاری)">
+      <button type="button" class="tasbih-btn" id="tasbihStartBtn">شروع</button>
+      <button type="button" class="tasbih-btn secondary" id="tasbihCancelBtn">بازگشت</button>
+    </div>
+    <div class="tasbih-counter" id="tasbihCounter" style="display:none">
+      <div class="tasbih-zone" id="tasbihZone">
+        <div class="tasbih-count" id="tasbihCount">0</div>
+        <div class="tasbih-target" id="tasbihTargetText"></div>
+      </div>
+      <button type="button" class="tasbih-btn secondary" id="tasbihBackBtn">بازگشت</button>
     </div>
   </div>
 
@@ -1648,6 +1810,102 @@
         handleTouchClick(event);
       }
     });
+
+    /* تسبیح دیجیتال */
+    (function () {
+      const ov = document.getElementById("tasbihOverlay");
+      const setup = document.getElementById("tasbihSetup");
+      const counter = document.getElementById("tasbihCounter");
+      const input = document.getElementById("tasbihTarget");
+      const zone = document.getElementById("tasbihZone");
+      const countEl = document.getElementById("tasbihCount");
+      const targetEl = document.getElementById("tasbihTargetText");
+      let target = 0;
+      let targets = [];
+      let phase = 0;
+      const inputs = [input, document.getElementById("tasbihTarget2"), document.getElementById("tasbihTarget3")];
+      let count = 0;
+      let audioCtx = null;
+
+      function beep() {
+        try {
+          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          [0, 0.3, 0.6].forEach((t) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = "sine";
+            o.frequency.value = 880;
+            g.gain.value = 0.3;
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.start(audioCtx.currentTime + t);
+            o.stop(audioCtx.currentTime + t + 0.2);
+          });
+        } catch (e) {}
+        try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+      }
+
+      function showSetup() {
+        setup.style.display = "";
+        counter.style.display = "none";
+        inputs.forEach((i) => { i.value = ""; });
+        setTimeout(() => input.focus(), 50);
+      }
+
+      document.querySelectorAll(".tasbih-open").forEach((b) => b.addEventListener("click", () => {
+        ov.classList.add("show");
+        showSetup();
+      }));
+
+      function close() {
+        ov.classList.remove("show");
+      }
+
+      document.getElementById("tasbihCancelBtn").addEventListener("click", close);
+      document.getElementById("tasbihBackBtn").addEventListener("click", close);
+
+      function start() {
+        targets = inputs
+          .map((i) => parseInt(i.value, 10))
+          .filter((n) => n && n >= 1);
+        if (targets.length === 0) {
+          showToast("یک عدد معتبر وارد کنید", 1800);
+          return;
+        }
+        phase = 0;
+        target = targets[0];
+        count = 0;
+        countEl.textContent = "0";
+        targetEl.textContent = "از " + target;
+        setup.style.display = "none";
+        counter.style.display = "";
+        requestWakeLock();
+      }
+
+      document.getElementById("tasbihStartBtn").addEventListener("click", start);
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") start(); });
+
+      zone.addEventListener("pointerup", (e) => {
+        e.preventDefault();
+        if (count >= target) {
+          if (phase + 1 >= targets.length) return;
+          phase++;
+          target = targets[phase];
+          count = 0;
+          targetEl.textContent = "از " + target;
+        }
+        count++;
+        countEl.textContent = String(count);
+        if (count === target) {
+          beep();
+          targetEl.textContent = "تعداد " + target + " تکمیل شد ✓";
+          showToast("تعداد " + target + " تکمیل شد", 4000);
+        }
+      });
+
+      zone.addEventListener("contextmenu", (e) => e.preventDefault());
+    })();
 
     // تنظیم مجدد اندازه فونت هنگام تغییر ابعاد صفحه
     window.addEventListener("resize", () => {

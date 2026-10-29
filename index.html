@@ -949,10 +949,211 @@
         font-size: 20px;
       }
     }
+
+    /* ===== [افزوده] مدیریت ختم‌ها و نذرها — CSS ===== */
+    .khatm-open-btn { margin-top: 2px; }
+    .kh-overlay {
+      position: fixed; inset: 0; z-index: 10002; display: none;
+      align-items: center; justify-content: flex-start; flex-direction: column;
+      gap: 12px; padding: 16px; background: rgba(10,10,15,0.98);
+      overflow-y: auto; text-align: center;
+    }
+    .kh-overlay.show { display: flex; }
+    .kh-overlay.kh-top { z-index: 10003; justify-content: center; background: rgba(10,10,15,0.9); }
+    .kh-wrap { width: min(500px,100%); display: flex; flex-direction: column; gap: 12px; }
+    .kh-tabs { display: flex; gap: 8px; }
+    .kh-tab {
+      flex: 1; min-height: 42px; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 10px; color: var(--muted); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .kh-tab.active { background: var(--accent); color: var(--accent-dark); border-color: var(--accent); }
+    .kh-list { display: flex; flex-direction: column; gap: 10px; }
+    .kh-empty { color: var(--muted); font-size: 14px; padding: 24px 0; }
+    .kh-card {
+      background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 12px; display: flex; flex-direction: column; gap: 8px; text-align: right;
+    }
+    .kh-card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .kh-name { font-size: 16px; font-weight: 700; }
+    .kh-sub { color: var(--muted); font-size: 13px; }
+    .kh-bar { width: 100%; height: 6px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+    .kh-bar > i { display: block; height: 100%; width: 0; background: #2ecc71; border-radius: 6px; transition: width .2s; }
+    .kh-actions { display: flex; gap: 8px; align-items: center; }
+    .kh-go {
+      flex: 1; min-height: 40px; background: #2ecc71; color: #06280f; border: none;
+      border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 800; cursor: pointer;
+    }
+    .kh-del {
+      min-height: 40px; min-width: 44px; background: transparent; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 16px; cursor: pointer;
+    }
+    .kh-done-tick { color: #2ecc71; font-weight: 800; margin-left: 6px; }
+    .kh-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .kh-chips .tasbih-chip { width: auto; padding: 6px 12px; min-height: 34px; }
+    .kh-label { text-align: right; font-size: 14px; font-weight: 700; }
+    .kh-modal {
+      width: min(420px,100%); background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .kh-modal h3 { margin: 0; font-size: 18px; }
+    .kh-modal p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
+    .kh-bless { font-size: 22px; font-weight: 800; color: var(--accent); }
+    .kh-head { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+    .kh-head .kh-title { font-size: 15px; font-weight: 700; }
+    .kh-counter { width: min(500px,100%); flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+    /* ===== Home Hub (لایه ورودی) ===== */
+    .orient-hint { display: none !important; }
+    @media (orientation: portrait) {
+      body.mode-prayer .orient-hint { display: flex !important; }
+    }
+    .home-hub {
+      position: fixed; inset: 0; z-index: 20000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; padding: 24px 18px; overflow-y: auto; direction: rtl;
+      background: radial-gradient(ellipse at 50% 0%, #1b2a3f 0%, #0b0f17 70%);
+      color: var(--text);
+    }
+    .home-hub.hide { display: none; }
+    .hub-title { font-size: 30px; font-weight: 800; letter-spacing: .5px; color: #f3e7c3; text-align: center; margin-top: 8px; }
+    .hub-sub { font-size: 14px; color: var(--muted); font-style: italic; margin-bottom: 14px; text-align: center; }
+    .hub-card {
+      position: relative; width: min(440px, 100%); display: flex; align-items: center; gap: 16px;
+      padding: 20px 18px; border-radius: 20px; text-align: right; font-family: inherit; color: var(--text);
+      background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1); border-right: 5px solid var(--hc);
+      box-shadow: 0 8px 24px rgba(0,0,0,.35); cursor: pointer;
+      transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hub-card:hover { box-shadow: 0 10px 30px color-mix(in srgb, var(--hc) 35%, transparent); background: rgba(255,255,255,.08); }
+    .hub-card:active { transform: scale(.97); }
+    .hub-icon {
+      flex: 0 0 auto; width: 58px; height: 58px; border-radius: 16px; font-size: 30px;
+      display: flex; align-items: center; justify-content: center;
+      background: color-mix(in srgb, var(--hc) 18%, transparent);
+    }
+    .hub-txt { display: flex; flex-direction: column; gap: 5px; }
+    .hub-name { font-size: 19px; font-weight: 700; }
+    .hub-desc { font-size: 13px; color: var(--muted); font-style: italic; }
+    .hub-card.emerald { --hc: #10b981; }
+    .hub-card.teal { --hc: #22d3ee; }
+    .hub-card.gold { --hc: #d4af37; opacity: .85; }
+    .hub-badge {
+      position: absolute; top: 10px; left: 12px; font-size: 11px; padding: 2px 10px; border-radius: 999px;
+      background: rgba(212,175,55,.18); color: #e8c75a; border: 1px solid rgba(212,175,55,.4);
+    }
+    .back-btn {
+      background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important;
+      font-size: 11px; font-weight: 700;
+    }
+    .center-controls .exit-btn, .center-controls .back-btn { min-height: 0; }
+    .tasbih-exit { flex: none; width: 100%; height: 44px; min-height: 44px; font-size: 14px; margin-top: 4px; }
+
+    /* ===== تسبیح و ختم‌ها: چیدمان عمودی و ریسپانسیو ===== */
+    .tasbih-overlay,
+    .kh-overlay {
+      min-height: 100vh;
+      min-height: 100dvh;
+      justify-content: flex-start;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      -webkit-overflow-scrolling: touch;
+    }
+    .tasbih-overlay.show,
+    .kh-overlay.show { display: flex; }
+    .tasbih-setup,
+    .tasbih-counter,
+    .kh-wrap,
+    .kh-counter {
+      width: 100%;
+      max-width: 500px;
+      margin: auto 0;
+    }
+    .tasbih-input {
+      width: 100%;
+      min-height: 48px;
+      font-size: 18px; /* جلوگیری از زوم خودکار iOS هنگام ورود عدد */
+      text-align: center;
+    }
+    .tasbih-btn { min-height: 48px; }
+    .tasbih-zone,
+    #khZone {
+      min-height: 260px;
+      height: 46dvh;
+      max-height: 520px;
+    }
+    .tasbih-count,
+    #khCount { font-size: clamp(56px, 18vw, 96px); line-height: 1.1; }
+    @media (orientation: landscape) and (max-height: 500px) {
+      .tasbih-zone,
+      #khZone { min-height: 200px; height: 70dvh; }
+      .tasbih-overlay,
+      .kh-overlay { justify-content: flex-start; }
+    }
+    @media (max-width: 360px) {
+      .tasbih-count,
+      #khCount { font-size: 52px; }
+    }
+
+    /* ===== دکمه خروج صفحه اصلی ===== */
+    .hub-exit {
+      position: relative; overflow: hidden; margin-top: 10px;
+      width: min(320px, 90%); height: 50px; border-radius: 999px;
+      border: 1.5px solid rgba(231,76,60,.55); background: rgba(231,76,60,.08);
+      color: #ff8a80; font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; touch-action: manipulation; user-select: none;
+    }
+    .hub-exit-txt { position: relative; z-index: 1; }
+    .hub-exit-fill {
+      position: absolute; top: 0; right: 0; height: 100%; width: 0;
+      background: linear-gradient(90deg, #e74c3c, #c0392b); opacity: .85;
+    }
+    .hub-bye {
+      position: fixed; inset: 0; z-index: 30000; display: none;
+      align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(ellipse at 50% 30%, #1b2a3f 0%, #05070b 80%);
+      direction: rtl; text-align: center;
+    }
+    .hub-bye.show { display: flex; animation: byeIn .5s ease; }
+    .hub-bye-box { max-width: 420px; display: flex; flex-direction: column; gap: 18px; align-items: center; }
+    .hub-bye-icon { font-size: 56px; }
+    .hub-bye p { margin: 0; color: #f5e6b3; font-size: 20px; font-weight: 700; line-height: 2; }
+    @keyframes byeIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 
 <body>
+
+  <!-- Home Hub: صفحه ورودی و انتخاب بخش -->
+  <div class="home-hub" id="homeHub">
+    <div class="hub-title">همراه معنوی پرهام</div>
+    <div class="hub-sub">رکعت‌شمار، تسبیح و ختم</div>
+    <button type="button" class="hub-card emerald" id="hubPrayer">
+      <span class="hub-icon">🕌</span>
+      <span class="hub-txt"><span class="hub-name">رکعت‌شمار نماز</span><span class="hub-desc">حالت افقی (Landscape) روی سجاده</span></span>
+    </button>
+    <button type="button" class="hub-card teal" id="hubTasbih">
+      <span class="hub-icon">📿</span>
+      <span class="hub-txt"><span class="hub-name">تسبیح دیجیتال و ختم‌ها</span><span class="hub-desc">حالت عمودی (Portrait) در دست</span></span>
+    </button>
+    <button type="button" class="hub-card gold" id="hubTreasure">
+      <span class="hub-badge">به‌زودی</span>
+      <span class="hub-icon">📖</span>
+      <span class="hub-txt"><span class="hub-name">گنجینه معنوی</span><span class="hub-desc">ادعیه، زیارات و تعقیبات مشترک</span></span>
+    </button>
+    <button type="button" class="hub-exit" id="hubExitBtn" aria-label="خروج با نگه داشتن یک ثانیه">
+      <span class="hub-exit-txt">✕ خروج از برنامه</span>
+      <span class="hub-exit-fill"></span>
+    </button>
+  </div>
+
+  <div class="hub-bye" id="hubBye">
+    <div class="hub-bye-box">
+      <div class="hub-bye-icon">🤲</div>
+      <p>هدیه به محضر مقدس امام عصر (ارواحنا فداه)، صلواتی عنایت فرمایید</p>
+    </div>
+  </div>
+
 
   <div class="orient-hint">
     لطفاً برای استفاده، گوشی را به حالت افقی نگه دارید
@@ -1043,6 +1244,11 @@
             class="reset-progress"
             id="resetProgress"
           ></div>
+        </button>
+
+        <button type="button" class="exit-btn back-btn" id="backPrayerBtn" aria-label="بازگشت به انتخاب نوع نماز با نگه داشتن یک ثانیه">
+          <span>⌂ بازگشت</span>
+          <div class="exit-progress" style="background:var(--accent)"></div>
         </button>
 
         <!-- دکمه خروج در پایین (تم قرمز) -->
@@ -1194,6 +1400,8 @@
     </div>
     </div>
 
+    <button type="button" class="exit-btn overlay-exit-btn back-btn"><span>⌂ بازگشت به صفحه اصلی</span></button>
+
     <!-- خروج خارج از کادر انتخاب نماز و در پایین آن (تم قرمز) -->
 
     <button
@@ -1231,6 +1439,8 @@
       </button>
 
       <button type="button" class="done-reset tasbih-open" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text)">تسبیح دیجیتال</button>
+
+      <button type="button" class="exit-btn overlay-exit-btn back-btn"><span>⌂ بازگشت به صفحه اصلی</span></button>
 
       <!-- خروج زیر دکمه نماز جدید (تم قرمز) -->
 
@@ -1283,6 +1493,10 @@
       <input type="number" inputmode="numeric" min="1" class="tasbih-input" id="tasbihTarget3" placeholder="عدد سوم (اختیاری)">
       <button type="button" class="tasbih-btn" id="tasbihStartBtn">شروع</button>
       <button type="button" class="tasbih-btn secondary" id="tasbihCancelBtn">بازگشت</button>
+      <button type="button" class="exit-btn tasbih-exit" id="exitTasbihBtn" aria-label="خروج با نگه داشتن یک ثانیه">
+        <span>✕ خروج</span>
+        <div class="exit-progress"></div>
+      </button>
     </div>
     <div class="tasbih-counter" id="tasbihCounter" style="display:none">
       <div class="tasbih-zone" id="tasbihZone">
@@ -1290,6 +1504,62 @@
         <div class="tasbih-target" id="tasbihTargetText"></div>
       </div>
       <button type="button" class="tasbih-btn secondary" id="tasbihBackBtn">بازگشت</button>
+    </div>
+  </div>
+
+  <!-- ===== [افزوده] مدیریت ختم‌ها و نذرها — HTML ===== -->
+  <div class="kh-overlay" id="khList">
+    <div class="kh-wrap">
+      <div class="tasbih-title">مدیریت ختم‌ها</div>
+      <button type="button" class="tasbih-btn" id="khNewBtn">+ تعریف ختم جدید</button>
+      <div class="kh-tabs">
+        <button type="button" class="kh-tab active" data-tab="active">در حال انجام</button>
+        <button type="button" class="kh-tab" data-tab="done">تکمیل‌شده‌ها</button>
+      </div>
+      <div class="kh-list" id="khItems"></div>
+      <button type="button" class="tasbih-btn secondary" id="khListClose">بازگشت</button>
+    </div>
+  </div>
+  <div class="kh-overlay kh-top" id="khForm">
+    <div class="kh-modal">
+      <h3>تعریف ختم جدید</h3>
+      <div class="kh-label">شرح / عنوان ذکر</div>
+      <input type="text" class="tasbih-input" id="khTitle" placeholder="مثلاً صلوات" style="font-size:18px">
+      <div class="kh-chips" id="khTitleChips"></div>
+      <div class="kh-label">تعداد کل نذر</div>
+      <input type="number" inputmode="numeric" min="1" class="tasbih-input" id="khTotal" placeholder="تعداد">
+      <div class="kh-chips" id="khTotalChips"></div>
+      <button type="button" class="tasbih-btn" id="khSave">ذخیره و شروع</button>
+      <button type="button" class="tasbih-btn secondary" id="khCancel">انصراف</button>
+    </div>
+  </div>
+  <div class="kh-overlay" id="khCounter">
+    <div class="kh-counter">
+      <div class="kh-head">
+        <div class="kh-title" id="khCTitle"></div>
+        <div class="kh-bar"><i id="khCBar"></i></div>
+        <div class="kh-sub" id="khCPct"></div>
+      </div>
+      <div class="tasbih-zone" id="khZone" style="width:100%">
+        <div class="tasbih-count" id="khCount">0</div>
+        <div class="tasbih-target">باقی‌مانده</div>
+      </div>
+      <button type="button" class="tasbih-btn secondary" id="khStop">توقف و خروج (ذخیره می‌شود)</button>
+    </div>
+  </div>
+  <div class="kh-overlay kh-top" id="khDone">
+    <div class="kh-modal">
+      <div style="font-size:48px">🤲</div>
+      <div class="kh-bless">طاعت و نذر شما قبول حق</div>
+      <p id="khDoneText"></p>
+      <button type="button" class="tasbih-btn" id="khDoneOk">آمین</button>
+    </div>
+  </div>
+  <div class="kh-overlay kh-top" id="khConfirm">
+    <div class="kh-modal">
+      <p id="khConfirmText" style="color:var(--text)"></p>
+      <button type="button" class="tasbih-btn" id="khConfirmYes" style="background:#e74c3c;color:#fff">حذف</button>
+      <button type="button" class="tasbih-btn secondary" id="khConfirmNo">انصراف</button>
     </div>
   </div>
 
@@ -2043,6 +2313,224 @@
       zone.addEventListener("contextmenu", (e) => e.preventDefault());
     })();
 
+    /* ===== [افزوده] مدیریت ختم‌ها و نذرها — JS (مستقل از تسبیح فعلی) ===== */
+    (function () {
+      const KEY = "parham_khatm_v1";
+      const $ = (id) => document.getElementById(id);
+      const toFa = (n) => Number(n).toLocaleString("fa-IR");
+      let tab = "active";
+      let cur = null;      // ختم در حال شمارش
+      let audioCtx = null;
+
+      // --- ذخیره‌سازی ---
+      function load() {
+        try {
+          const d = JSON.parse(localStorage.getItem(KEY));
+          if (d && Array.isArray(d.items)) return d;
+        } catch (e) {}
+        return { items: [] };
+      }
+      let db = load();
+      function save() {
+        try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {}
+      }
+
+      // --- صدا و ویبره ---
+      function ctx() {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      }
+      function tone(freqs, step, dur) {
+        try {
+          const c = ctx();
+          freqs.forEach((f, i) => {
+            const o = c.createOscillator(), g = c.createGain();
+            o.type = "sine"; o.frequency.value = f; g.gain.value = 0.3;
+            o.connect(g); g.connect(c.destination);
+            o.start(c.currentTime + i * step);
+            o.stop(c.currentTime + i * step + dur);
+          });
+        } catch (e) {}
+      }
+      function vib(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+
+      // --- نمایش لیست ---
+      function show(id, on) { $(id).classList.toggle("show", on); }
+
+      function render() {
+        const box = $("khItems");
+        box.innerHTML = "";
+        document.querySelectorAll(".kh-tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === tab));
+        let items;
+        if (tab === "active") items = db.items.filter((x) => !x.doneAt);
+        else items = db.items.filter((x) => x.doneAt).sort((a, b) => b.doneAt - a.doneAt).slice(0, 50);
+        if (!items.length) {
+          const e = document.createElement("div");
+          e.className = "kh-empty";
+          e.textContent = tab === "active" ? "ختم فعالی ندارید." : "ختم تکمیل‌شده‌ای وجود ندارد.";
+          box.appendChild(e);
+          return;
+        }
+        items.forEach((it) => {
+          const done = it.total - it.remaining;
+          const pct = Math.round((done / it.total) * 100);
+          const card = document.createElement("div");
+          card.className = "kh-card";
+          const head = document.createElement("div");
+          head.className = "kh-card-head";
+          const name = document.createElement("div");
+          name.className = "kh-name";
+          if (it.doneAt) {
+            const t = document.createElement("span");
+            t.className = "kh-done-tick"; t.textContent = "✓";
+            name.appendChild(t);
+          }
+          name.appendChild(document.createTextNode(it.title));
+          const sub = document.createElement("div");
+          sub.className = "kh-sub";
+          if (it.doneAt) {
+            let d;
+            try { d = new Date(it.doneAt).toLocaleDateString("fa-IR"); } catch (e) { d = new Date(it.doneAt).toLocaleDateString(); }
+            sub.textContent = toFa(it.total) + " تکرار • " + d;
+          } else {
+            sub.textContent = "باقی‌مانده " + toFa(it.remaining) + " از " + toFa(it.total) + " (" + toFa(pct) + "٪)";
+          }
+          head.appendChild(name);
+          card.appendChild(head);
+          card.appendChild(sub);
+          if (!it.doneAt) {
+            const bar = document.createElement("div");
+            bar.className = "kh-bar";
+            bar.innerHTML = "<i></i>";
+            bar.firstChild.style.width = pct + "%";
+            card.appendChild(bar);
+          }
+          const act = document.createElement("div");
+          act.className = "kh-actions";
+          if (!it.doneAt) {
+            const go = document.createElement("button");
+            go.type = "button"; go.className = "kh-go"; go.textContent = "ادامه ذکر";
+            go.addEventListener("click", () => startCount(it.id));
+            act.appendChild(go);
+          }
+          const del = document.createElement("button");
+          del.type = "button"; del.className = "kh-del"; del.textContent = "🗑";
+          del.setAttribute("aria-label", "حذف");
+          del.addEventListener("click", () => confirmDel(it));
+          act.appendChild(del);
+          card.appendChild(act);
+          box.appendChild(card);
+        });
+      }
+
+      function confirmDel(it) {
+        $("khConfirmText").textContent = "«" + it.title + "» حذف شود؟";
+        show("khConfirm", true);
+        $("khConfirmYes").onclick = () => {
+          db.items = db.items.filter((x) => x.id !== it.id);
+          save(); show("khConfirm", false); render();
+        };
+      }
+      $("khConfirmNo").addEventListener("click", () => show("khConfirm", false));
+
+      // --- فرم تعریف ---
+      ["صلوات", "ذکر یونسیه", "استغفار", "آیت‌الکرسی", "صلوات خاصه"].forEach((t) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "tasbih-chip"; b.textContent = t;
+        b.addEventListener("click", () => { $("khTitle").value = t; });
+        $("khTitleChips").appendChild(b);
+      });
+      [14, 40, 72, 100, 500, 1000, 12000, 14000].forEach((n) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "tasbih-chip"; b.textContent = toFa(n);
+        b.addEventListener("click", () => { $("khTotal").value = String(n); });
+        $("khTotalChips").appendChild(b);
+      });
+
+      $("khNewBtn").addEventListener("click", () => {
+        $("khTitle").value = ""; $("khTotal").value = "";
+        show("khForm", true);
+      });
+      $("khCancel").addEventListener("click", () => show("khForm", false));
+      $("khSave").addEventListener("click", () => {
+        const title = $("khTitle").value.trim();
+        const total = parseInt($("khTotal").value, 10);
+        if (!title) { showToast("عنوان ذکر را وارد کنید", 1800); return; }
+        if (!total || total < 1) { showToast("تعداد معتبر وارد کنید", 1800); return; }
+        const it = { id: "k" + Date.now() + Math.floor(Math.random() * 1000), title, total, remaining: total, createdAt: Date.now(), doneAt: null };
+        db.items.push(it);
+        save();
+        show("khForm", false);
+        tab = "active"; render();
+        startCount(it.id);
+      });
+
+      // --- شمارش ---
+      function paint() {
+        const done = cur.total - cur.remaining;
+        const pct = Math.round((done / cur.total) * 100);
+        $("khCTitle").textContent = "نذر " + cur.title + " | باقی‌مانده: " + toFa(cur.remaining) + " از " + toFa(cur.total);
+        $("khCount").textContent = toFa(cur.remaining);
+        $("khCBar").style.width = pct + "%";
+        $("khCPct").textContent = toFa(pct) + "٪ انجام شده";
+      }
+      function startCount(id) {
+        const it = db.items.find((x) => x.id === id && !x.doneAt);
+        if (!it) return;
+        cur = it;
+        paint();
+        show("khCounter", true);
+        try { requestWakeLock(); } catch (e) {}
+      }
+      function stopCount() {
+        save(); cur = null;
+        show("khCounter", false);
+        render();
+      }
+      $("khStop").addEventListener("click", stopCount);
+
+      $("khZone").addEventListener("pointerup", (e) => {
+        e.preventDefault();
+        if (!cur || cur.remaining <= 0) return;
+        cur.remaining--;
+        save();            // ذخیرهٔ زنده در هر لمس
+        paint();
+        if (cur.remaining > 0) {
+          vib(20);
+          tone([880], 0, 0.08);
+          return;
+        }
+        // لحظهٔ تکمیل نذر
+        cur.doneAt = Date.now();
+        save();
+        vib([200, 100, 200, 100, 400]);
+        tone([660, 880, 1100, 1320], 0.18, 0.3);
+        $("khDoneText").textContent = "ختم " + cur.title + " با تعداد " + toFa(cur.total) + " تکرار با موفقیت به پایان رسید.";
+        cur = null;
+        show("khDone", true);
+      });
+      $("khZone").addEventListener("contextmenu", (e) => e.preventDefault());
+      $("khDoneOk").addEventListener("click", () => {
+        show("khDone", false); show("khCounter", false);
+        tab = "done"; render();
+      });
+
+      // --- ورود و خروج ---
+      $("khListClose").addEventListener("click", () => show("khList", false));
+      document.querySelectorAll(".kh-tab").forEach((t) => t.addEventListener("click", () => { tab = t.dataset.tab; render(); }));
+      function openList() { db = load(); tab = "active"; render(); show("khList", true); }
+
+      // دکمهٔ «ختم‌ها و نذرها» در صفحهٔ تنظیمات تسبیح
+      const startBtn = $("tasbihStartBtn");
+      const kb = document.createElement("button");
+      kb.type = "button";
+      kb.className = "tasbih-btn secondary khatm-open-btn";
+      kb.textContent = "📿 ختم‌ها و نذورات";
+      kb.addEventListener("click", openList);
+      startBtn.parentNode.insertBefore(kb, startBtn.nextSibling);
+    })();
+
     // تنظیم مجدد اندازه فونت هنگام تغییر ابعاد صفحه
     window.addEventListener("resize", () => {
       fitDuaText();
@@ -2053,6 +2541,41 @@
     displayRandomDua();
     checkForOnlineUpdates();
     render();
+
+
+    /* ===== Home Hub: ناوبری ===== */
+    (function () {
+      const hub = document.getElementById("homeHub");
+      const $ = (id) => document.getElementById(id);
+      function closeTasbihLayers() {
+        if ($("khCounter").classList.contains("show")) $("khStop").click();
+        ["khConfirm", "khDone", "khForm", "khList"].forEach((id) => $(id).classList.remove("show"));
+        if ($("tasbihOverlay").classList.contains("show")) $("tasbihBackBtn").click();
+      }
+      function setMode(m) {
+        document.body.classList.toggle("mode-prayer", m === "prayer");
+        document.body.classList.toggle("mode-tasbih", m === "tasbih");
+        hub.classList.toggle("hide", m !== "");
+      }
+      $("hubPrayer").addEventListener("click", () => { closeTasbihLayers(); resetAndChoosePrayer(); setMode("prayer"); });
+      setupHoldAction($("backPrayerBtn"), $("backPrayerBtn").querySelector(".exit-progress"), EXIT_HOLD_MS, resetAndChoosePrayer);
+      $("hubTasbih").addEventListener("click", () => {
+        setMode("tasbih");
+        if (!$("tasbihOverlay").classList.contains("show")) $("tasbihOpenBtn").click();
+      });
+      // دکمه تسبیح داخل بخش نماز: حالت را به تسبیح تغییر بده تا پیام چرخش گوشی نیفتد
+      document.querySelectorAll(".tasbih-open").forEach((b) => b.addEventListener("click", () => setMode("tasbih")));
+      setupHoldAction($("hubExitBtn"), $("hubExitBtn").querySelector(".hub-exit-fill"), EXIT_HOLD_MS, () => {
+        $("hubBye").classList.add("show");
+        setTimeout(() => tryToExitApp(), 3000);
+      });
+      $("hubTreasure").addEventListener("click", () => showToast("این بخش به زودی فعال خواهد شد", 2000));
+      window.goHome = () => setMode("");
+      document.querySelectorAll(".back-btn:not(#backPrayerBtn)").forEach((b) => b.addEventListener("click", () => setMode("")));
+      $("tasbihCancelBtn").addEventListener("click", () => setMode(""));
+      $("tasbihBackBtn").addEventListener("click", () => setMode(""));
+      setupExitButton("exitTasbihBtn");
+    })();
 
 // ثبت Service Worker برای آفلاین شدن PWA
 if ('serviceWorker' in navigator) {

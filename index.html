@@ -11,7 +11,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#111827">
 
-  <title>رکعت شمار پرهام</title>
+  <title>همراه معنوی پرهام</title>
 
   <link rel="icon" type="image/png" href="icon-512.png">
   <link rel="apple-touch-icon" href="icon-512.png">
@@ -900,11 +900,6 @@
       text-align: center;
     }
 
-    @media (orientation: portrait) {
-      .orient-hint {
-        display: flex;
-      }
-    }
 
     @media (max-width: 560px) {
       .app-container {
@@ -1002,11 +997,16 @@
     .kh-head .kh-title { font-size: 15px; font-weight: 700; }
     .kh-counter { width: min(500px,100%); flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 
-    /* ===== Home Hub (لایه ورودی) ===== */
+    /* ===== راهنمای جهت‌گیری بخش‌ها ===== */
     .orient-hint { display: none !important; }
     @media (orientation: portrait) {
       body.mode-prayer .orient-hint { display: flex !important; }
     }
+    @media (orientation: landscape) {
+      body:not(.mode-prayer) .orient-hint { display: flex !important; }
+    }
+
+    /* ===== Home Hub (لایه ورودی) ===== */
     .home-hub {
       position: fixed; inset: 0; z-index: 20000;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -2552,11 +2552,21 @@
         ["khConfirm", "khDone", "khForm", "khList"].forEach((id) => $(id).classList.remove("show"));
         if ($("tasbihOverlay").classList.contains("show")) $("tasbihBackBtn").click();
       }
+      function updateOrientationHint() {
+        const hint = document.querySelector(".orient-hint");
+        if (hint) {
+          hint.textContent = document.body.classList.contains("mode-prayer")
+            ? "لطفاً برای استفاده از بخش نماز، گوشی را به حالت افقی نگه دارید"
+            : "لطفاً برای استفاده از صفحه اصلی، تسبیح و ختم‌ها، گوشی را به حالت عمودی نگه دارید";
+        }
+      }
       function setMode(m) {
         document.body.classList.toggle("mode-prayer", m === "prayer");
         document.body.classList.toggle("mode-tasbih", m === "tasbih");
         hub.classList.toggle("hide", m !== "");
+        updateOrientationHint();
       }
+      updateOrientationHint();
       $("hubPrayer").addEventListener("click", () => { closeTasbihLayers(); resetAndChoosePrayer(); setMode("prayer"); });
       setupHoldAction($("backPrayerBtn"), $("backPrayerBtn").querySelector(".exit-progress"), EXIT_HOLD_MS, resetAndChoosePrayer);
       $("hubTasbih").addEventListener("click", () => {

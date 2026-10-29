@@ -1246,12 +1246,7 @@
           ></div>
         </button>
 
-        <button type="button" class="exit-btn back-btn" id="backPrayerBtn" aria-label="بازگشت به انتخاب نوع نماز با نگه داشتن یک ثانیه">
-          <span>⌂ بازگشت</span>
-          <div class="exit-progress" style="background:var(--accent)"></div>
-        </button>
-
-        <!-- دکمه خروج در پایین (تم قرمز) -->
+         <!-- دکمه خروج در پایین (تم قرمز) -->
 
         <button
           type="button"
@@ -2568,7 +2563,7 @@
       }
       updateOrientationHint();
       $("hubPrayer").addEventListener("click", () => { closeTasbihLayers(); resetAndChoosePrayer(); setMode("prayer"); });
-      setupHoldAction($("backPrayerBtn"), $("backPrayerBtn").querySelector(".exit-progress"), EXIT_HOLD_MS, resetAndChoosePrayer);
+        
       $("hubTasbih").addEventListener("click", () => {
         setMode("tasbih");
         if (!$("tasbihOverlay").classList.contains("show")) $("tasbihOpenBtn").click();

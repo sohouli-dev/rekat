@@ -2441,7 +2441,7 @@
         b.addEventListener("click", () => { $("khTitle").value = t; });
         $("khTitleChips").appendChild(b);
       });
-      [14, 40, 72, 100, 500, 1000, 12000, 14000].forEach((n) => {
+      [14, 40, 72, 100, 400, 500, 1000].forEach((n) => {
         const b = document.createElement("button");
         b.type = "button"; b.className = "tasbih-chip"; b.textContent = toFa(n);
         b.addEventListener("click", () => { $("khTotal").value = String(n); });

@@ -1,9 +1,8 @@
 {
-  "name": "رکعت شمار پرهام",
-  "short_name": "رکعت شمار",
+  "name": "همراه معنوی پرهام",
+  "short_name": "همراه معنوی",
   "start_url": "./index.html",
   "display": "fullscreen",
-  "orientation": "landscape",
   "background_color": "#111827",
   "theme_color": "#111827",
   "icons": [

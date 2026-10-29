@@ -1,4 +1,4 @@
-const CACHE_NAME = "rakaat-counter-v8";
+const CACHE_NAME = "rakaat-counter-v9";
 const CACHE_PREFIX = "rakaat-counter-";
 
 // فقط فایل‌هایی که واقعاً دارید:

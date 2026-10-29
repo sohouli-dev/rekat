@@ -1119,6 +1119,17 @@
     .hub-bye-icon { font-size: 56px; }
     .hub-bye p { margin: 0; color: #f5e6b3; font-size: 20px; font-weight: 700; line-height: 2; }
     @keyframes byeIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+
+    /* پیام نگه‌داشتن گوشی به صورت عمودی (صفحه اصلی، تسبیح و ختم‌ها) */
+    .orient-hint-v {
+      position: fixed; inset: 0; z-index: 99999; display: none;
+      align-items: center; justify-content: center; padding: 32px;
+      background: rgba(10, 10, 15, 0.98); color: var(--text);
+      font-size: 18px; text-align: center; direction: rtl;
+    }
+    @media (orientation: landscape) and (pointer: coarse) {
+      body:not(.mode-prayer) .orient-hint-v { display: flex; }
+    }
   </style>
 </head>
 
@@ -1157,6 +1168,10 @@
 
   <div class="orient-hint">
     لطفاً برای استفاده، گوشی را به حالت افقی نگه دارید
+  </div>
+
+  <div class="orient-hint-v">
+    لطفاً برای استفاده، گوشی را به حالت عمودی نگه دارید
   </div>
 
   <div class="app-container">
@@ -2556,6 +2571,14 @@
         document.body.classList.toggle("mode-prayer", m === "prayer");
         document.body.classList.toggle("mode-tasbih", m === "tasbih");
         hub.classList.toggle("hide", m !== "");
+        // تلاش برای قفل جهت صفحه (در صورت پشتیبانی مرورگر/PWA)؛ در غیر این صورت فقط پیام نمایش داده می‌شود
+        try {
+          const so = screen.orientation;
+          if (so && so.lock) {
+            const p = so.lock(m === "prayer" ? "landscape" : "portrait");
+            if (p && p.catch) p.catch(() => {});
+          }
+        } catch (e) {}
       }
       $("hubPrayer").addEventListener("click", () => { closeTasbihLayers(); resetAndChoosePrayer(); setMode("prayer"); });
       setupHoldAction($("backPrayerBtn"), $("backPrayerBtn").querySelector(".exit-progress"), EXIT_HOLD_MS, resetAndChoosePrayer);
